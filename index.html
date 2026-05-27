@@ -1,263 +1,333 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Taneira · Sarees for Women · Product Architecture Visualization</title>
-  <!-- Tailwind CSS via CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Vis-Network for interactive topology graph -->
-  <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
-  <link href="https://unpkg.com/vis-network/styles/vis-network.min.css" rel="stylesheet" type="text/css" />
-  <style>
-    body {
-      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #faf7f5;
-      margin: 0;
-      padding: 0;
-    }
-    #topology-container {
-      height: 68vh;
-      width: 100%;
-      border-radius: 1.25rem;
-      overflow: hidden;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-      background: #ffffff;
-      border: 1px solid #ede4dc;
-    }
-    .risk-badge-critical {
-      background: #fee2e2;
-      color: #991b1b;
-      border-left: 4px solid #dc2626;
-    }
-    .risk-badge-high {
-      background: #ffedd5;
-      color: #9a3412;
-      border-left: 4px solid #f97316;
-    }
-    .risk-badge-medium {
-      background: #fef9c3;
-      color: #854d0e;
-      border-left: 4px solid #eab308;
-    }
-    .node-tooltip {
-      background: #1e293b;
-      color: white;
-      padding: 0.5rem 1rem;
-      border-radius: 0.5rem;
-      font-size: 0.8rem;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-      max-width: 280px;
-      pointer-events: none;
-    }
-    .legend-dot {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      border-radius: 2px;
-      margin-right: 6px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaayathri Sarees | Timeless Indian Tradition</title>
+    <style>
+        /* Base Styles & Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: #fcfbf9;
+            color: #333;
+        }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* Color Palette */
+        :root {
+            --primary-color: #800020; /* Burgundy/Maroon */
+            --secondary-color: #D4AF37; /* Gold */
+            --light-bg: #f5f5f5;
+        }
+
+        /* Header & Navigation */
+        header {
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary-color);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .nav-links {
+            display: flex;
+            gap: 25px;
+        }
+        .nav-links a {
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover {
+            color: var(--secondary-color);
+        }
+        .cart-btn {
+            background-color: var(--primary-color);
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .cart-btn:hover {
+            background-color: #600018;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1610189013233-02f431b99ff1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover;
+            height: 70vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            padding: 0 20px;
+        }
+        .hero-content h1 {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+            color: var(--secondary-color);
+        }
+        .hero-content p {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .cta-btn {
+            background-color: var(--secondary-color);
+            color: #333;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 3px;
+            transition: background 0.3s;
+        }
+        .cta-btn:hover {
+            background-color: #fff;
+        }
+
+        /* Categories Section */
+        .section-title {
+            text-align: center;
+            margin: 60px 0 30px;
+            font-size: 2.2rem;
+            color: var(--primary-color);
+        }
+        .categories {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            padding: 0 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+        }
+        .category-card {
+            background-color: var(--light-bg);
+            padding: 40px;
+            text-align: center;
+            border-radius: 8px;
+            width: 250px;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-bottom: 4px solid var(--secondary-color);
+        }
+        .category-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .category-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        /* Featured Products */
+        .products {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            padding: 0 5% 60px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .product-card {
+            background: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+        .product-card:hover {
+            transform: scale(1.02);
+        }
+        .product-img {
+            width: 100%;
+            height: 350px;
+            object-fit: cover;
+            background-color: #eee;
+        }
+        .product-info {
+            padding: 20px;
+            text-align: center;
+        }
+        .product-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        .product-price {
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+        .add-to-cart {
+            display: inline-block;
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        .add-to-cart:hover {
+            background-color: var(--primary-color);
+            color: #fff;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--primary-color);
+            color: #fff;
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 50px;
+        }
+        footer p {
+            margin-bottom: 10px;
+        }
+        .footer-links {
+            margin-top: 20px;
+        }
+        .footer-links a {
+            color: var(--secondary-color);
+            margin: 0 10px;
+        }
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none; 
+            }
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+            .logo {
+                font-size: 22px;
+            }
+        }
+    </style>
 </head>
-<body class="antialiased p-5 md:p-8">
+<body>
 
-  <!-- Header with project identity & risk summary -->
-  <header class="mb-6 flex flex-wrap items-start justify-between gap-5">
-    <div>
-      <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-stone-800 flex items-center gap-3">
-        <span class="bg-amber-700 text-white px-4 py-1.5 rounded-xl text-xl shadow-sm">TANEIRA</span>
-        Sarees for Women
-      </h1>
-      <p class="text-stone-500 mt-2 max-w-3xl text-sm leading-relaxed">
-        <strong class="text-stone-700">Architecture Style:</strong> Server-Side Rendered eCommerce with Faceted Search 
-        <span class="ml-2 text-xs bg-stone-100 px-2 py-0.5 rounded-full">evidence: Salesforce Commerce Cloud / Demandware AJAX endpoints</span>.
-        <br><span class="text-xs text-stone-400 mt-1 block">Interactive product catalog topology · 702 products observed · drag, click, zoom</span>
-      </p>
-    </div>
-    <div class="flex flex-wrap gap-2 items-center">
-      <span class="risk-badge-critical px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm">CRITICAL: 0</span>
-      <span class="risk-badge-high px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm">HIGH: 1 (duplicate facet values)</span>
-      <span class="risk-badge-medium px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm">MEDIUM: 2</span>
-    </div>
-  </header>
+    <!-- Header / Navigation -->
+    <header>
+        <nav>
+            <div class="logo">GAAYATHRI SAREES</div>
+            <div class="nav-links">
+                <a href="#home">Home</a>
+                <a href="#shop">Collections</a>
+                <a href="#about">Our Story</a>
+                <a href="#contact">Contact</a>
+            </div>
+            <a href="#cart" class="cart-btn">Cart (0)</a>
+        </nav>
+    </header>
 
-  <!-- Interactive Topology Graph -->
-  <section class="mb-5">
-    <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
-      <h2 class="text-lg font-semibold text-stone-700 flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span> 
-        product discovery topology · faceted navigation graph
-      </h2>
-      <div class="text-xs text-stone-500 bg-white px-3 py-1.5 rounded-full shadow-sm border border-stone-200">
-        🖱️ drag nodes · 🔍 scroll to zoom · click for detail
-      </div>
-    </div>
-    <div id="topology-container"></div>
-    <div id="node-detail-panel" class="mt-4 p-5 bg-white rounded-xl border border-stone-200 shadow-md text-sm text-stone-700 hidden transition-all">
-      <p class="font-semibold text-stone-800 text-base" id="detail-title">Select a node</p>
-      <p id="detail-description" class="mt-2"></p>
-    </div>
-  </section>
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1>Drape Yourself in Elegance</h1>
+            <p>Discover our handpicked collection of authentic Banarasi, Kanjeevaram, Designer, and Cotton sarees woven with tradition and love.</p>
+            <a href="#shop" class="cta-btn">Shop New Arrivals</a>
+        </div>
+    </section>
 
-  <!-- Legend and quick facts -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-6">
-    <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm">
-      <h3 class="font-semibold text-stone-700 flex items-center gap-2"><span class="text-lg">🧵</span> Facet Categories</h3>
-      <ul class="mt-3 text-xs space-y-1.5 text-stone-600">
-        <li><span class="legend-dot bg-indigo-500"></span> Discount (6 buckets)</li>
-        <li><span class="legend-dot bg-emerald-500"></span> Fabric (29 values)</li>
-        <li><span class="legend-dot bg-amber-500"></span> Colour (42 values)</li>
-        <li><span class="legend-dot bg-cyan-500"></span> Occasion (12 values)</li>
-        <li><span class="legend-dot bg-purple-500"></span> Origin (34 values)</li>
-        <li><span class="legend-dot bg-rose-500"></span> Craft / Pattern (25 values)</li>
-        <li><span class="legend-dot bg-teal-500"></span> Zari (20 values)</li>
-        <li><span class="legend-dot bg-stone-500"></span> Loom / Blouse / Shipping</li>
-      </ul>
-    </div>
-    <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm">
-      <h3 class="font-semibold text-stone-700 flex items-center gap-2"><span class="text-lg">⚡</span> Observations (Evidence)</h3>
-      <ul class="mt-3 text-xs space-y-2 text-stone-600">
-        <li>• AJAX facet endpoint: <code class="bg-stone-100 px-1 rounded">Search-ShowAjax?cgid=sarees-for-women</code></li>
-        <li>• Platform: Salesforce Commerce Cloud (Demandware)</li>
-        <li>• Total hit count: 702 products</li>
-        <li>• Price slider range: 0 – 60,000</li>
-      </ul>
-    </div>
-    <div class="bg-white p-5 rounded-xl border border-stone-200 shadow-sm">
-      <h3 class="font-semibold text-red-700 flex items-center gap-2"><span class="text-lg">⚠️</span> Data Quality Risks</h3>
-      <ul class="mt-3 text-xs space-y-2">
-        <li class="risk-badge-high px-2 py-1 rounded">HIGH · Duplicate facet values (e.g., "Handwoven Saree" / "Hand Woven", "Cotton and Combination" / "Cotton And Combination")</li>
-        <li class="risk-badge-medium px-2 py-1 rounded mt-1">MEDIUM · Inconsistent casing in Zari values ("GoldTested Zari" vs "GOLD TESTED ZARI")</li>
-        <li class="risk-badge-medium px-2 py-1 rounded mt-1">MEDIUM · Missing presentationId for some colour entries (reduces visual filter UX)</li>
-      </ul>
-    </div>
-  </div>
+    <!-- Shop by Category -->
+    <h2 class="section-title">Shop by Category</h2>
+    <section class="categories">
+        <div class="category-card">
+            <h3>Pure Silk</h3>
+            <p>Timeless Kanjeevaram & Banarasi</p>
+        </div>
+        <div class="category-card">
+            <h3>Daily Cotton</h3>
+            <p>Breathable & Comfortable</p>
+        </div>
+        <div class="category-card">
+            <h3>Designer Wear</h3>
+            <p>Georgette, Chiffon & Fancy Sarees</p>
+        </div>
+        <div class="category-card">
+            <h3>Bridal Collection</h3>
+            <p>Exclusive weaves for your special day</p>
+        </div>
+    </section>
 
-  <script>
-    (function() {
-      // ---- DATA LAYER (extracted from provided URL context) ----
-      const nodesData = [
-        // Core product node
-        { id: 1, label: 'Sarees for Women\n(702 products)', group: 'core', risk: 'none', evidence: 'cgid=sarees-for-women, hitCount:702' },
-        // Facet category nodes
-        { id: 2, label: 'Discount\n6 options', group: 'facet', risk: 'none', evidence: 'fold facet, 6 buckets (0%-40%)' },
-        { id: 3, label: 'Fabric\n29 values', group: 'facet', risk: 'none', evidence: 'fabrics facet, top: Silk Cotton(382), Silk(302)' },
-        { id: 4, label: 'Colour\n42 values', group: 'facet', risk: 'medium', evidence: 'color facet, missing presentationId for some (DarkGreen, Peach etc.)' },
-        { id: 5, label: 'Occasion\n12 values', group: 'facet', risk: 'none', evidence: 'occasion facet, Festive(884), Casual(335)' },
-        { id: 6, label: 'Origin\n34 values', group: 'facet', risk: 'none', evidence: 'origin facet, Contemporary(560), Bengal(268)' },
-        { id: 7, label: 'Craft / Pattern\n25 values', group: 'facet', risk: 'none', evidence: 'craft facet, Woven Design(538), Embroidered(208)' },
-        { id: 8, label: 'Zari\n20 values', group: 'facet', risk: 'high', evidence: 'zari facet, duplicate/inconsistent labels (GoldTested Zari, GOLD TESTED ZARI)' },
-        { id: 9, label: 'Loom Type\n9 values', group: 'facet', risk: 'high', evidence: 'loom facet, duplicate Handwoven/Hand Woven, "0" value present' },
-        { id: 10, label: 'Blouse Piece\n3 values', group: 'facet', risk: 'none', evidence: 'blouseType, Unstitched(1677) dominates' },
-        { id: 11, label: 'Intl. Shipping\nAvailable(326)', group: 'facet', risk: 'none', evidence: 'internationalShipping facet' },
-        { id: 12, label: 'Origin Country\nIndia(1692)', group: 'facet', risk: 'none', evidence: 'originCountry facet, almost all India' },
-        // Infrastructure nodes (inferred with high confidence)
-        { id: 13, label: 'Salesforce Commerce Cloud\n(Demandware)', group: 'infra', risk: 'none', evidence: 'URL pattern: /on/demandware.store/...' },
-        { id: 14, label: 'AJAX Facet API\nSearch-ShowAjax', group: 'backend', risk: 'none', evidence: 'endpoint in every facet URL' },
-        { id: 15, label: 'Price Slider\n0 – 60,000', group: 'ui', risk: 'none', evidence: 'price range slider visible in data' },
-      ];
+    <!-- Featured Products Section -->
+    <h2 id="shop" class="section-title">Featured Sarees</h2>
+    <section class="products">
+        <!-- Product 1 -->
+        <div class="product-card">
+            <img src="https://images.unsplash.com/photo-1583391733958-d25e07fac0ec?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Banarasi Silk Saree" class="product-img">
+            <div class="product-info">
+                <h3 class="product-title">Royal Red Banarasi Silk</h3>
+                <p class="product-price">₹8,499</p>
+                <button class="add-to-cart">Add to Cart</button>
+            </div>
+        </div>
 
-      const edgesData = [
-        { from: 1, to: 2, dashes: false, title: 'facet refinement' },
-        { from: 1, to: 3, dashes: false },
-        { from: 1, to: 4, dashes: false },
-        { from: 1, to: 5, dashes: false },
-        { from: 1, to: 6, dashes: false },
-        { from: 1, to: 7, dashes: false },
-        { from: 1, to: 8, dashes: false },
-        { from: 1, to: 9, dashes: false },
-        { from: 1, to: 10, dashes: false },
-        { from: 1, to: 11, dashes: false },
-        { from: 1, to: 12, dashes: false },
-        { from: 1, to: 15, dashes: true, title: 'price filter' },
-        { from: 14, to: 1, dashes: true, title: 'serves product data' },
-        { from: 13, to: 14, dashes: true, title: 'hosts endpoint' },
-      ];
+        <!-- Product 2 -->
+        <div class="product-card">
+            <img src="https://images.unsplash.com/photo-1610189013233-02f431b99ff1?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Kanjeevaram Saree" class="product-img">
+            <div class="product-info">
+                <h3 class="product-title">Emerald Green Kanjeevaram</h3>
+                <p class="product-price">₹12,999</p>
+                <button class="add-to-cart">Add to Cart</button>
+            </div>
+        </div>
 
-      // Node styling by group
-      const groupStyles = {
-        core: { color: { background: '#b91c1c', border: '#7f1d1d' }, shape: 'dot', size: 45, font: { color: '#ffffff', size: 14, face: 'Inter' } },
-        facet: { color: { background: '#e7e5e4', border: '#a8a29e' }, shape: 'box', size: 18, font: { color: '#44403c', size: 11 } },
-        infra: { color: { background: '#1e293b', border: '#0f172a' }, shape: 'hexagon', size: 22, font: { color: '#f1f5f9', size: 11 } },
-        backend: { color: { background: '#6366f1', border: '#4338ca' }, shape: 'dot', size: 20, font: { color: '#ffffff', size: 11 } },
-        ui: { color: { background: '#0d9488', border: '#0f766e' }, shape: 'square', size: 18, font: { color: '#ffffff', size: 11 } },
-      };
+        <!-- Product 3 -->
+        <div class="product-card">
+            <img src="https://images.unsplash.com/photo-1583391265517-35bbdadd3df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Cotton Saree" class="product-img">
+            <div class="product-info">
+                <h3 class="product-title">Handloom Indigo Cotton</h3>
+                <p class="product-price">₹2,199</p>
+                <button class="add-to-cart">Add to Cart</button>
+            </div>
+        </div>
+    </section>
 
-      // Apply risk border styling
-      const riskBorder = {
-        high: { borderWidth: 3, borderDashes: [8, 4], color: { border: '#f97316' } },
-        medium: { borderWidth: 2, borderDashes: [5, 3], color: { border: '#eab308' } },
-        none: {},
-      };
+    <!-- Footer -->
+    <footer id="contact">
+        <p>&copy; 2026 Gaayathri Sarees. All rights reserved.</p>
+        <p>Email: contact@gaayathrisarees.com | Phone: +91 98765 43210</p>
+        <div class="footer-links">
+            <a href="#">Shipping Policy</a> | 
+            <a href="#">Return Policy</a> | 
+            <a href="#">Instagram</a> | 
+            <a href="#">Facebook</a> |
+            <a href="#">YouTube</a>
+        </div>
+    </footer>
 
-      const nodes = new vis.DataSet(nodesData.map(n => {
-        const style = groupStyles[n.group] || groupStyles.facet;
-        const riskStyle = riskBorder[n.risk] || {};
-        return {
-          ...n,
-          ...style,
-          borderWidth: riskStyle.borderWidth || 2,
-          borderDashes: riskStyle.borderDashes || false,
-          color: {
-            ...style.color,
-            border: riskStyle.color?.border || style.color.border,
-          },
-          title: `<div class="node-tooltip"><strong>${n.label.replace(/\n/g, '<br>')}</strong><br><span style="font-size:0.7rem;opacity:0.9;">Evidence: ${n.evidence || 'inferred from URL context'}</span></div>`,
-        };
-      }));
-
-      const edges = new vis.DataSet(edgesData.map(e => ({
-        ...e,
-        dashes: e.dashes || false,
-        arrows: 'to',
-        color: { color: '#a8a29e', highlight: '#78716c' },
-        smooth: { type: 'continuous' },
-      })));
-
-      const container = document.getElementById('topology-container');
-      const network = new vis.Network(container, { nodes, edges }, {
-        physics: {
-          solver: 'forceAtlas2Based',
-          forceAtlas2Based: { gravitationalConstant: -40, centralGravity: 0.005, springLength: 180, springConstant: 0.03 },
-          stabilization: { iterations: 200 },
-        },
-        interaction: {
-          hover: true,
-          tooltipDelay: 100,
-          zoomView: true,
-          dragView: true,
-        },
-        layout: { improvedLayout: true },
-      });
-
-      // Detail panel on click
-      const detailPanel = document.getElementById('node-detail-panel');
-      const detailTitle = document.getElementById('detail-title');
-      const detailDesc = document.getElementById('detail-description');
-
-      network.on('click', function(params) {
-        if (params.nodes.length > 0) {
-          const nodeId = params.nodes[0];
-          const node = nodes.get(nodeId);
-          detailPanel.classList.remove('hidden');
-          detailTitle.innerText = node.label.replace(/\n/g, ' ');
-          const riskLabel = node.risk === 'high' ? '🔴 HIGH' : (node.risk === 'medium' ? '🟡 MEDIUM' : '🟢 LOW/NONE');
-          detailDesc.innerHTML = `<strong>Type:</strong> ${node.group}<br><strong>Risk:</strong> ${riskLabel}<br><strong>Evidence:</strong> ${node.evidence || 'Observed from provided facet data'}<br><span class="text-xs text-stone-400">(click another node to update)</span>`;
-        } else {
-          detailPanel.classList.add('hidden');
-        }
-      });
-
-      // Double-click to focus
-      network.on('doubleClick', function(params) {
-        if (params.nodes.length > 0) {
-          network.focus(params.nodes[0], { scale: 1.8, animation: true });
-        }
-      });
-
-      // Initial fit
-      setTimeout(() => network.fit({ animation: true }), 400);
-    })();
-  </script>
 </body>
 </html>
