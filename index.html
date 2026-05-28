@@ -80,11 +80,12 @@
     }
     @keyframes ringRotate { to { transform: rotate(360deg); } }
 
-    /* Circular video mask */
+    /* Circular video mask — clip-path instead of overflow:hidden
+       so we can size the video to fit fully without any cutting */
     .pre-circle {
       width: 420px; height: 420px;
       border-radius: 50%;
-      overflow: hidden;
+      overflow: visible;
       position: relative;
       background: #4B0E4E;
       box-shadow:
@@ -94,14 +95,13 @@
       z-index: 1;
     }
     #introVideo {
-      /* Scale video so its height fills the circle fully —
-         width follows naturally, no black bars, no distortion */
+      /* Sized by JS once metadata loads — fits full video inside circle */
       position: absolute;
       top: 50%; left: 50%;
-      width: auto; height: 100%;
-      min-width: 100%;
       transform: translate(-50%, -50%);
+      border-radius: 50%;
       display: block;
+      background: #4B0E4E;
     }
 
     /* Brand name below circle */
@@ -540,7 +540,7 @@
     <div class="pre-ring"></div>
     <div class="pre-ring-inner"></div>
     <div class="pre-circle">
-      <video id="introVideo" src="images/intro.mp4"
+      <video id="introVideo" src="images/intro.MP4"
              autoplay muted playsinline preload="auto">
       </video>
     </div>
@@ -858,27 +858,70 @@
        SCRIPTS
   ══════════════════════════════════ -->
   <script>
-    /* ── VIDEO PRELOADER — plays intro.MP4 for 6 s then fades out ── */
+    /* ── VIDEO PRELOADER — auto-fits circle to video so nothing gets cut ── */
     (function () {
-      const pre   = document.getElementById('preloader');
-      const video = document.getElementById('introVideo');
+      const pre    = document.getElementById('preloader');
+      const video  = document.getElementById('introVideo');
+      const circle = document.querySelector('.pre-circle');
+      const ringOuter = document.querySelector('.pre-ring');
+      const ringInner = document.querySelector('.pre-ring-inner');
 
       function dismiss() {
         pre.classList.add('fade-out');
         setTimeout(revealOnScroll, 800);
       }
 
-      // Primary: fade after exactly 6 seconds from first playback
+      /* Once video metadata is ready we know its real width & height.
+         We pick the SMALLER dimension as the circle diameter so the video
+         fits entirely inside — no edge gets cropped, no black bars.        */
+      function fitVideoToCircle() {
+        const vw = video.videoWidth;
+        const vh = video.videoHeight;
+        if (!vw || !vh) return;
+
+        /* Circle diameter = smaller of video's two dimensions
+           so the full video is always visible inside the circle.
+           Cap at 90vmin so it never overflows small screens.      */
+        const maxD  = Math.min(window.innerWidth, window.innerHeight) * 0.88;
+        const minDim = Math.min(vw, vh);
+        const scale  = Math.min(maxD / minDim, 1.2); // allow slight upscale max 1.2×
+        const D      = Math.round(minDim * scale);    // circle diameter
+
+        /* Size the circle exactly to the video's smaller dimension */
+        circle.style.width  = D + 'px';
+        circle.style.height = D + 'px';
+
+        /* Video: maintain aspect ratio, fit fully inside circle */
+        if (vw <= vh) {
+          /* Portrait or square — width fills circle */
+          video.style.width  = D + 'px';
+          video.style.height = 'auto';
+        } else {
+          /* Landscape — height fills circle */
+          video.style.height = D + 'px';
+          video.style.width  = 'auto';
+        }
+
+        /* Scale outer rings proportionally */
+        const ring  = D + 40;
+        const ring2 = D + 18;
+        ringOuter.style.width  = ring  + 'px';
+        ringOuter.style.height = ring  + 'px';
+        ringInner.style.width  = ring2 + 'px';
+        ringInner.style.height = ring2 + 'px';
+      }
+
+      video.addEventListener('loadedmetadata', fitVideoToCircle);
+      window.addEventListener('resize', fitVideoToCircle);
+
+      /* Primary: fade after 6 s from first playback */
       video.addEventListener('playing', function handler() {
         video.removeEventListener('playing', handler);
         setTimeout(dismiss, 6000);
       }, { once: true });
 
-      // Fallback A: video ended before 6 s (short clip)
-      video.addEventListener('ended', dismiss, { once: true });
-
-      // Fallback B: video failed to load / play at all → hide after 7 s max
-      video.addEventListener('error', () => setTimeout(dismiss, 500));
+      video.addEventListener('ended',  dismiss, { once: true });
+      video.addEventListener('error',  () => setTimeout(dismiss, 500));
       setTimeout(dismiss, 7000);
     })();
 
