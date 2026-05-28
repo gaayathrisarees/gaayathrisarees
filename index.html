@@ -80,12 +80,11 @@
     }
     @keyframes ringRotate { to { transform: rotate(360deg); } }
 
-    /* Circular video mask — clip-path instead of overflow:hidden
-       so we can size the video to fit fully without any cutting */
+    /* Circular video mask — optimised for 1280×720 landscape video */
     .pre-circle {
       width: 420px; height: 420px;
       border-radius: 50%;
-      overflow: visible;
+      overflow: hidden;
       position: relative;
       background: #4B0E4E;
       box-shadow:
@@ -93,15 +92,19 @@
         0 0 32px 8px rgba(212,175,55,0.45),
         0 0 70px 14px rgba(75,14,78,0.7);
       z-index: 1;
+      flex-shrink: 0;
     }
     #introVideo {
-      /* Sized by JS once metadata loads — fits full video inside circle */
+      /* 1280×720 landscape: scale so height = circle height (420px)
+         → rendered width = 420 × (1280/720) = 747px
+         Then shift left to show the center 420px strip              */
       position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      border-radius: 50%;
+      height: 100%;
+      width: auto;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
       display: block;
-      background: #4B0E4E;
     }
 
     /* Brand name below circle */
@@ -504,6 +507,9 @@
        MOBILE NAV
     ═══════════════════════════════════════ */
     @media(max-width:768px){
+      .pre-circle { width: 88vw; height: 88vw; }
+      .pre-ring   { width: calc(88vw + 40px); height: calc(88vw + 40px); }
+      .pre-ring-inner { width: calc(88vw + 18px); height: calc(88vw + 18px); }
       .hamburger { display:flex; }
       .nav-links {
         position:fixed; top:116px; left:0; right:0;
@@ -858,71 +864,25 @@
        SCRIPTS
   ══════════════════════════════════ -->
   <script>
-    /* ── VIDEO PRELOADER — auto-fits circle to video so nothing gets cut ── */
+    /* ── VIDEO PRELOADER — 1280×720 landscape, plays 6 s then fades out ── */
     (function () {
-      const pre    = document.getElementById('preloader');
-      const video  = document.getElementById('introVideo');
-      const circle = document.querySelector('.pre-circle');
-      const ringOuter = document.querySelector('.pre-ring');
-      const ringInner = document.querySelector('.pre-ring-inner');
+      const pre   = document.getElementById('preloader');
+      const video = document.getElementById('introVideo');
 
       function dismiss() {
         pre.classList.add('fade-out');
         setTimeout(revealOnScroll, 800);
       }
 
-      /* Once video metadata is ready we know its real width & height.
-         We pick the SMALLER dimension as the circle diameter so the video
-         fits entirely inside — no edge gets cropped, no black bars.        */
-      function fitVideoToCircle() {
-        const vw = video.videoWidth;
-        const vh = video.videoHeight;
-        if (!vw || !vh) return;
-
-        /* Circle diameter = smaller of video's two dimensions
-           so the full video is always visible inside the circle.
-           Cap at 90vmin so it never overflows small screens.      */
-        const maxD  = Math.min(window.innerWidth, window.innerHeight) * 0.88;
-        const minDim = Math.min(vw, vh);
-        const scale  = Math.min(maxD / minDim, 1.2); // allow slight upscale max 1.2×
-        const D      = Math.round(minDim * scale);    // circle diameter
-
-        /* Size the circle exactly to the video's smaller dimension */
-        circle.style.width  = D + 'px';
-        circle.style.height = D + 'px';
-
-        /* Video: maintain aspect ratio, fit fully inside circle */
-        if (vw <= vh) {
-          /* Portrait or square — width fills circle */
-          video.style.width  = D + 'px';
-          video.style.height = 'auto';
-        } else {
-          /* Landscape — height fills circle */
-          video.style.height = D + 'px';
-          video.style.width  = 'auto';
-        }
-
-        /* Scale outer rings proportionally */
-        const ring  = D + 40;
-        const ring2 = D + 18;
-        ringOuter.style.width  = ring  + 'px';
-        ringOuter.style.height = ring  + 'px';
-        ringInner.style.width  = ring2 + 'px';
-        ringInner.style.height = ring2 + 'px';
-      }
-
-      video.addEventListener('loadedmetadata', fitVideoToCircle);
-      window.addEventListener('resize', fitVideoToCircle);
-
-      /* Primary: fade after 6 s from first playback */
+      /* Fade after 6 s from first frame */
       video.addEventListener('playing', function handler() {
         video.removeEventListener('playing', handler);
         setTimeout(dismiss, 6000);
       }, { once: true });
 
-      video.addEventListener('ended',  dismiss, { once: true });
-      video.addEventListener('error',  () => setTimeout(dismiss, 500));
-      setTimeout(dismiss, 7000);
+      video.addEventListener('ended', dismiss, { once: true });
+      video.addEventListener('error', () => setTimeout(dismiss, 500));
+      setTimeout(dismiss, 7000); /* hard cap */
     })();
 
     /* ── MOBILE NAV TOGGLE ── */
