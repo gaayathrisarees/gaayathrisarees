@@ -42,6 +42,7 @@
     html { scroll-behavior: smooth; }
     body {
       font-family: var(--font);
+      font-weight: 400;
       background: var(--dark);
       color: var(--cream);
       overflow-x: hidden;
@@ -52,39 +53,18 @@
     ═══════════════════════════════════════ */
     #preloader {
       position: fixed; inset: 0;
-      background: var(--dark);
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
+      background: #000;
+      display: flex; align-items: center; justify-content: center;
       z-index: 9999;
-      transition: opacity 0.9s ease, visibility 0.9s ease;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
     }
     #preloader.fade-out { opacity: 0; visibility: hidden; }
 
-    #peacockCanvas {
+    #introVideo {
+      width: 100%; height: 100%;
+      object-fit: cover;
       display: block;
     }
-
-    .spinner-ring {
-      width: 58px; height: 58px;
-      border: 3px solid transparent;
-      border-top-color: var(--gold);
-      border-right-color: var(--gold);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-top: -12px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    .preloader-text {
-      margin-top: 20px;
-      font-size: 1.05rem;
-      font-weight: 700;
-      letter-spacing: .32em;
-      color: var(--gold);
-      text-transform: uppercase;
-      animation: pulse 1.6s ease-in-out infinite;
-    }
-    @keyframes pulse { 0%,100%{opacity:.35} 50%{opacity:1} }
 
     /* ═══════════════════════════════════════
        NAVBAR
@@ -97,24 +77,16 @@
       z-index: 1000;
       padding: 0 40px;
       display: flex; align-items: center; justify-content: space-between;
-      height: 84px;
+      height: 100px;
     }
     .nav-logo img {
-      height: 72px;
+      height: 90px;
       object-fit: contain;
-      filter: drop-shadow(0 0 6px #fff) drop-shadow(0 0 16px var(--gold)) drop-shadow(0 0 30px rgba(212,175,55,0.6)) brightness(1.25) contrast(1.1);
+      filter: none;
     }
     .nav-logo span {
       font-size: 1.3rem;
-      font-weight: 700;
-      color: var(--gold);
-      letter-spacing:.15em;
-      margin-left:12px;
-      vertical-align:middle;
-    }
-    .nav-logo span {
-      font-size: 1.3rem;
-      font-weight: 700;
+      font-weight: 400;
       color: var(--gold);
       letter-spacing:.15em;
       margin-left:12px;
@@ -473,7 +445,7 @@
     @media(max-width:768px){
       .hamburger { display:flex; }
       .nav-links {
-        position:fixed; top:84px; left:0; right:0;
+        position:fixed; top:100px; left:0; right:0;
         background:rgba(26,5,38,.97);
         flex-direction:column; align-items:center;
         padding:32px 0; gap:24px;
@@ -501,12 +473,13 @@
 <body>
 
   <!-- ══════════════════════════════════
-       PRELOADER
+       PRELOADER — intro video
   ══════════════════════════════════ -->
   <div id="preloader">
-    <canvas id="peacockCanvas" width="520" height="520"></canvas>
-    <div class="spinner-ring"></div>
-    <p class="preloader-text">Gaayathri Sarees</p>
+    <video id="introVideo" src="images/intro.MP4"
+           autoplay muted playsinline
+           preload="auto">
+    </video>
   </div>
 
   <!-- ══════════════════════════════════
@@ -821,324 +794,29 @@
        SCRIPTS
   ══════════════════════════════════ -->
   <script>
-    /* ── CANVAS PEACOCK PRELOADER — Natural Fan Opening ── */
+    /* ── VIDEO PRELOADER — plays intro.MP4 for 6 s then fades out ── */
     (function () {
-      const canvas = document.getElementById('peacockCanvas');
-      const ctx = canvas.getContext('2d');
-      const W = 520, H = 520;
-      canvas.width  = W;
-      canvas.height = H;
+      const pre   = document.getElementById('preloader');
+      const video = document.getElementById('introVideo');
 
-      /* ── Layout constants ── */
-      const BX = W / 2;         // 260 — horizontal center
-      const BY = H * 0.75;      // 390 — tail-fan pivot (low so full fan is visible above)
-
-      const FEATHER_LEN = 185;   // full length of each tail feather
-      const FEATHER_W   = 14;    // half-width of feather vane
-      const EYE_R       = 14;    // radius of ocellus (eye spot)
-      const TOTAL       = 24;    // number of tail feathers
-
-      /* Natural peacock fan: all feathers start pointing straight up (closed),
-         then spread symmetrically outward to ±100° (200° total arc).
-         The centre feather stays vertical; outer ones sweep to the sides. */
-      const MAX_SPREAD_DEG = 100;  // each side from vertical centre
-      // Final angle (radians) for feather i  (0 = pointing straight up)
-      function finalAngle(i) {
-        const norm = i / (TOTAL - 1);          // 0 → 1
-        const deg  = -MAX_SPREAD_DEG + norm * MAX_SPREAD_DEG * 2;
-        return deg * Math.PI / 180;
-      }
-
-      /* ── Animation state ── */
-      // fanProg: 0 = all feathers closed (vertical), 1 = fully spread
-      let fanProg   = 0;
-      let startTime = null;
-      const FAN_DUR = 2800;   // ms to open from closed → full
-      const HOLD    = 900;    // ms to hold fully open
-      let phase     = 'opening';   // 'opening' | 'hold' | 'done'
-      let holdStart = null;
-
-      function easeOutBack(t) {
-        // slight overshoot then settle — feels like a real feather spreading
-        const c1 = 1.30158, c3 = c1 + 1;
-        return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
-      }
-      function easeInOutCubic(t) {
-        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-      }
-
-      /* ── Draw one tail feather ──
-         angle    : current spread angle (radians from vertical)
-         openness : 0 = feather completely folded/thin, 1 = fully open vane
-      */
-      function drawFeather(angle, openness) {
-        const FL  = FEATHER_LEN;
-        const FW  = FEATHER_W * openness;      // vane width scales with openness
-        const eyeDist = FL * 0.83;
-
-        ctx.save();
-        ctx.translate(BX, BY);
-        ctx.rotate(angle);   // rotate around tail-base pivot
-
-        /* — Rachis (central stem) — always full length so no feather "cuts" */
-        ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.lineTo(0, -FL);
-        ctx.strokeStyle = `rgba(160, 120, 10, 0.55)`;
-        ctx.lineWidth   = 1.4;
-        ctx.stroke();
-
-        /* — Vane (the wide part of the feather) — two bezier halves */
-        if (openness > 0.01) {
-          // Left half of vane
-          ctx.beginPath();
-          ctx.moveTo(0, 0);
-          ctx.bezierCurveTo(
-            -FW * 2.2, -FL * 0.25,
-            -FW * 2.8, -FL * 0.6,
-            0, -FL
-          );
-          // Right half of vane (mirror)
-          ctx.bezierCurveTo(
-             FW * 2.8, -FL * 0.6,
-             FW * 2.2, -FL * 0.25,
-            0, 0
-          );
-          ctx.closePath();
-
-          const vaneGrd = ctx.createLinearGradient(0, 0, 0, -FL);
-          vaneGrd.addColorStop(0,    `rgba(60,10,65,${0.7 * openness})`);
-          vaneGrd.addColorStop(0.30, `rgba(0,130,100,${0.85 * openness})`);
-          vaneGrd.addColorStop(0.60, `rgba(0,180,140,${0.9 * openness})`);
-          vaneGrd.addColorStop(0.80, `rgba(20,160,200,${0.85 * openness})`);
-          vaneGrd.addColorStop(1,    `rgba(0,210,160,${0.7 * openness})`);
-          ctx.fillStyle = vaneGrd;
-          ctx.fill();
-
-          /* Fine barb lines radiating from stem */
-          const BARBS = 18;
-          for (let b = 1; b < BARBS; b++) {
-            const t   = b / BARBS;
-            const y   = -FL * t;
-            const xEnd = FW * 2.6 * Math.sin(Math.PI * t) * openness;
-            // right barb
-            ctx.beginPath();
-            ctx.moveTo(0, y);
-            ctx.lineTo( xEnd, y - FL * 0.025);
-            ctx.strokeStyle = `rgba(0,200,160,${0.25 * openness})`;
-            ctx.lineWidth = 0.6;
-            ctx.stroke();
-            // left barb
-            ctx.beginPath();
-            ctx.moveTo(0, y);
-            ctx.lineTo(-xEnd, y - FL * 0.025);
-            ctx.stroke();
-          }
-        }
-
-        /* — Ocellus (eye spot) — fades in once openness > 0.4 */
-        if (openness > 0.4) {
-          const ep = Math.min(1, (openness - 0.4) / 0.6);
-          const er = EYE_R * ep;
-          const ey = -eyeDist;
-
-          // Outer gold halo
-          const halo = ctx.createRadialGradient(0, ey, er * 0.85, 0, ey, er + 5);
-          halo.addColorStop(0, `rgba(212,175,55,${0.55 * ep})`);
-          halo.addColorStop(1, `rgba(212,175,55,0)`);
-          ctx.beginPath();
-          ctx.arc(0, ey, er + 5, 0, Math.PI * 2);
-          ctx.fillStyle = halo;
-          ctx.fill();
-
-          // Iridescent eye rings
-          const eyeGrd = ctx.createRadialGradient(0, ey, 0, 0, ey, er);
-          eyeGrd.addColorStop(0,    `rgba(10,0,20,${ep})`);           // dark pupil centre
-          eyeGrd.addColorStop(0.28, `rgba(20,80,200,${ep})`);          // deep blue
-          eyeGrd.addColorStop(0.52, `rgba(0,200,160,${ep})`);          // teal
-          eyeGrd.addColorStop(0.75, `rgba(212,175,55,${ep})`);         // gold ring
-          eyeGrd.addColorStop(1,    `rgba(80,20,85,${ep})`);           // purple edge
-          ctx.beginPath();
-          ctx.arc(0, ey, er, 0, Math.PI * 2);
-          ctx.fillStyle = eyeGrd;
-          ctx.fill();
-
-          // Pupil
-          ctx.beginPath();
-          ctx.arc(0, ey, er * 0.28, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(5,0,10,${ep})`;
-          ctx.fill();
-
-          // Catchlight
-          ctx.beginPath();
-          ctx.arc(-er * 0.2, ey - er * 0.2, er * 0.15, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255,255,255,${0.65 * ep})`;
-          ctx.fill();
-        }
-
-        ctx.restore();
-      }
-
-      /* ── Draw peacock body (always on top of feathers) ── */
-      function drawBody() {
-        // Tail-base glow
-        const tg = ctx.createRadialGradient(BX, BY, 4, BX, BY, 46);
-        tg.addColorStop(0, 'rgba(107,30,110,0.9)');
-        tg.addColorStop(1, 'rgba(75,14,78,0)');
-        ctx.beginPath();
-        ctx.arc(BX, BY, 46, 0, Math.PI * 2);
-        ctx.fillStyle = tg;
-        ctx.fill();
-
-        // Body oval
-        const bg = ctx.createLinearGradient(BX - 24, BY - 22, BX + 24, BY + 38);
-        bg.addColorStop(0, '#5a1560');
-        bg.addColorStop(1, '#2a0535');
-        ctx.beginPath();
-        ctx.ellipse(BX, BY + 10, 23, 33, 0, 0, Math.PI * 2);
-        ctx.fillStyle = bg;
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(212,175,55,0.4)';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-
-        // Wings — slight arc on each side
-        [[-1, -0.15], [1, -0.15]].forEach(([sx]) => {
-          ctx.beginPath();
-          ctx.ellipse(BX + sx * 30, BY + 5, 14, 22, sx * 0.35, 0, Math.PI * 2);
-          const wg = ctx.createLinearGradient(BX + sx*20, BY - 14, BX + sx*40, BY + 26);
-          wg.addColorStop(0, 'rgba(0,120,90,0.7)');
-          wg.addColorStop(1, 'rgba(0,80,60,0.4)');
-          ctx.fillStyle = wg;
-          ctx.fill();
-        });
-
-        // Neck
-        const ng = ctx.createLinearGradient(BX - 8, BY - 42, BX + 8, BY - 10);
-        ng.addColorStop(0, '#1a9090');
-        ng.addColorStop(1, '#0d5050');
-        ctx.beginPath();
-        ctx.ellipse(BX, BY - 25, 8, 22, 0, 0, Math.PI * 2);
-        ctx.fillStyle = ng;
-        ctx.fill();
-
-        // Head
-        const hg = ctx.createRadialGradient(BX - 3, BY - 56, 2, BX, BY - 52, 15);
-        hg.addColorStop(0, '#22aaaa');
-        hg.addColorStop(1, '#0d5050');
-        ctx.beginPath();
-        ctx.arc(BX, BY - 52, 15, 0, Math.PI * 2);
-        ctx.fillStyle = hg;
-        ctx.fill();
-
-        // Crest (5 plumes)
-        [[-10,-16],[-5,-21],[0,-24],[5,-21],[10,-16]].forEach(([dx,dy]) => {
-          ctx.beginPath();
-          ctx.moveTo(BX, BY - 65);
-          ctx.quadraticCurveTo(BX + dx * 0.5, BY - 65 + dy * 0.5, BX + dx, BY - 65 + dy);
-          ctx.strokeStyle = '#D4AF37';
-          ctx.lineWidth   = 1.6;
-          ctx.lineCap = 'round';
-          ctx.stroke();
-          ctx.beginPath();
-          ctx.arc(BX + dx, BY - 65 + dy, 3.2, 0, Math.PI * 2);
-          ctx.fillStyle = '#D4AF37';
-          ctx.fill();
-        });
-
-        // Eye
-        ctx.beginPath();
-        ctx.arc(BX + 6, BY - 54, 4.5, 0, Math.PI * 2);
-        ctx.fillStyle = 'white';
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(BX + 7, BY - 54, 2.8, 0, Math.PI * 2);
-        ctx.fillStyle = '#050010';
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(BX + 5.5, BY - 55.5, 1.1, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255,255,255,0.85)';
-        ctx.fill();
-
-        // Beak
-        ctx.beginPath();
-        ctx.moveTo(BX + 13, BY - 49);
-        ctx.lineTo(BX + 24, BY - 45);
-        ctx.lineTo(BX + 13, BY - 43);
-        ctx.closePath();
-        ctx.fillStyle = '#c8a020';
-        ctx.fill();
-
-        // Legs
-        [BX - 9, BX + 9].forEach(fx => {
-          ctx.beginPath();
-          ctx.moveTo(fx, BY + 42);
-          ctx.lineTo(fx - 2, BY + 56);
-          ctx.strokeStyle = '#8B6914';
-          ctx.lineWidth = 2.5;
-          ctx.lineCap = 'round';
-          ctx.stroke();
-          // Toes
-          [-6, 0, 6].forEach(tx => {
-            ctx.beginPath();
-            ctx.moveTo(fx - 2, BY + 56);
-            ctx.lineTo(fx - 2 + tx, BY + 63);
-            ctx.lineWidth = 1.5;
-            ctx.stroke();
-          });
-        });
-      }
-
-      /* ── Animation loop ── */
-      function frame(ts) {
-        if (!startTime) startTime = ts;
-        const elapsed = ts - startTime;
-        ctx.clearRect(0, 0, W, H);
-
-        if (phase === 'opening') {
-          fanProg = Math.min(1, easeOutBack(Math.min(1, elapsed / FAN_DUR)));
-          // Natural opening: feathers spread from centre outward.
-          // Centre feathers (near i = TOTAL/2) open first; outer ones follow.
-          for (let i = 0; i < TOTAL; i++) {
-            const distFromCentre = Math.abs(i - (TOTAL - 1) / 2) / ((TOTAL - 1) / 2); // 0(centre)→1(edge)
-            // each feather's spread angle: smoothly interpolated from 0 → finalAngle
-            const featherProg = Math.max(0, Math.min(1,
-              (fanProg - distFromCentre * 0.35) / 0.65
-            ));
-            const angle = finalAngle(i) * easeInOutCubic(featherProg);
-            // openness: vane widens as feather spreads
-            const openness = featherProg;
-            drawFeather(angle, openness);
-          }
-          drawBody();
-
-          if (fanProg >= 1) { phase = 'hold'; holdStart = ts; }
-          requestAnimationFrame(frame);
-
-        } else if (phase === 'hold') {
-          for (let i = 0; i < TOTAL; i++) drawFeather(finalAngle(i), 1);
-          drawBody();
-          if (ts - holdStart > HOLD) phase = 'done';
-          requestAnimationFrame(frame);
-
-        } else {
-          // keep drawing fully open so preloader CSS fade looks clean
-          for (let i = 0; i < TOTAL; i++) drawFeather(finalAngle(i), 1);
-          drawBody();
-        }
-      }
-
-      requestAnimationFrame(frame);
-    })();
-
-    /* ── PRELOADER FADE OUT ── */
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        const pre = document.getElementById('preloader');
+      function dismiss() {
         pre.classList.add('fade-out');
-        setTimeout(revealOnScroll, 900);
-      }, 3200);
-    });
+        setTimeout(revealOnScroll, 800);
+      }
+
+      // Primary: fade after exactly 6 seconds from first playback
+      video.addEventListener('playing', function handler() {
+        video.removeEventListener('playing', handler);
+        setTimeout(dismiss, 6000);
+      }, { once: true });
+
+      // Fallback A: video ended before 6 s (short clip)
+      video.addEventListener('ended', dismiss, { once: true });
+
+      // Fallback B: video failed to load / play at all → hide after 7 s max
+      video.addEventListener('error', () => setTimeout(dismiss, 500));
+      setTimeout(dismiss, 7000);
+    })();
 
     /* ── MOBILE NAV TOGGLE ── */
     function toggleNav() {
