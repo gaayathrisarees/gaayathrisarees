@@ -1,333 +1,1119 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gaayathri Sarees | Timeless Indian Tradition</title>
-    <style>
-        /* Base Styles & Reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        body {
-            background-color: #fcfbf9;
-            color: #333;
-        }
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gaayathri Sarees – Hyderabad</title>
 
-        /* Color Palette */
-        :root {
-            --primary-color: #800020; /* Burgundy/Maroon */
-            --secondary-color: #D4AF37; /* Gold */
-            --light-bg: #f5f5f5;
-        }
+  <!-- Cinzel Bold from local Fonts folder (repo path) -->
+  <style>
+    @font-face {
+      font-family: 'Cinzel';
+      src: url('Fonts/Cinzel-Bold.ttf') format('truetype'),
+           url('Fonts/Cinzel-Bold.woff2') format('woff2');
+      font-weight: 700;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: 'Cinzel';
+      src: url('Fonts/Cinzel-Regular.ttf') format('truetype'),
+           url('Fonts/Cinzel-Regular.woff2') format('woff2');
+      font-weight: 400;
+      font-style: normal;
+    }
+  </style>
+  <!-- Google Fonts fallback for Cinzel -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&display=swap" rel="stylesheet"/>
 
-        /* Header & Navigation */
-        header {
-            background-color: #fff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 5%;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .logo {
-            font-size: 28px;
-            font-weight: bold;
-            color: var(--primary-color);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-        .nav-links {
-            display: flex;
-            gap: 25px;
-        }
-        .nav-links a {
-            font-weight: 500;
-            transition: color 0.3s;
-        }
-        .nav-links a:hover {
-            color: var(--secondary-color);
-        }
-        .cart-btn {
-            background-color: var(--primary-color);
-            color: #fff;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-weight: bold;
-            transition: background 0.3s;
-        }
-        .cart-btn:hover {
-            background-color: #600018;
-        }
+  <style>
+    /* ═══════════════════════════════════════
+       CSS VARIABLES & RESET
+    ═══════════════════════════════════════ */
+    :root {
+      --royal:   #4B0E4E;
+      --gold:    #D4AF37;
+      --gold-lt: #F0D060;
+      --cream:   #FDF6E3;
+      --dark:    #1a0520;
+      --font:    'Cinzel', serif;
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      background: var(--dark);
+      color: var(--cream);
+      overflow-x: hidden;
+    }
 
-        /* Hero Section */
-        .hero {
-            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1610189013233-02f431b99ff1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover;
-            height: 70vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            color: white;
-            padding: 0 20px;
-        }
-        .hero-content h1 {
-            font-size: 3.5rem;
-            margin-bottom: 15px;
-            color: var(--secondary-color);
-        }
-        .hero-content p {
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .cta-btn {
-            background-color: var(--secondary-color);
-            color: #333;
-            padding: 15px 30px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            border-radius: 3px;
-            transition: background 0.3s;
-        }
-        .cta-btn:hover {
-            background-color: #fff;
-        }
+    /* ═══════════════════════════════════════
+       PRELOADER
+    ═══════════════════════════════════════ */
+    #preloader {
+      position: fixed; inset: 0;
+      background: var(--dark);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.9s ease, visibility 0.9s ease;
+    }
+    #preloader.fade-out { opacity: 0; visibility: hidden; }
 
-        /* Categories Section */
-        .section-title {
-            text-align: center;
-            margin: 60px 0 30px;
-            font-size: 2.2rem;
-            color: var(--primary-color);
-        }
-        .categories {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            padding: 0 5%;
-            max-width: 1200px;
-            margin: 0 auto;
-            flex-wrap: wrap;
-        }
-        .category-card {
-            background-color: var(--light-bg);
-            padding: 40px;
-            text-align: center;
-            border-radius: 8px;
-            width: 250px;
-            cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
-            border-bottom: 4px solid var(--secondary-color);
-        }
-        .category-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-        .category-card h3 {
-            color: var(--primary-color);
-            margin-bottom: 8px;
-        }
+    #peacockCanvas {
+      display: block;
+    }
 
-        /* Featured Products */
-        .products {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
-            padding: 0 5% 60px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .product-card {
-            background: #fff;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            transition: transform 0.3s;
-        }
-        .product-card:hover {
-            transform: scale(1.02);
-        }
-        .product-img {
-            width: 100%;
-            height: 350px;
-            object-fit: cover;
-            background-color: #eee;
-        }
-        .product-info {
-            padding: 20px;
-            text-align: center;
-        }
-        .product-title {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-        }
-        .product-price {
-            color: var(--primary-color);
-            font-weight: bold;
-            font-size: 1.3rem;
-            margin-bottom: 15px;
-        }
-        .add-to-cart {
-            display: inline-block;
-            background-color: transparent;
-            color: var(--primary-color);
-            border: 2px solid var(--primary-color);
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: bold;
-        }
-        .add-to-cart:hover {
-            background-color: var(--primary-color);
-            color: #fff;
-        }
+    .spinner-ring {
+      width: 58px; height: 58px;
+      border: 3px solid transparent;
+      border-top-color: var(--gold);
+      border-right-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-top: -12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Footer */
-        footer {
-            background-color: var(--primary-color);
-            color: #fff;
-            text-align: center;
-            padding: 40px 20px;
-            margin-top: 50px;
-        }
-        footer p {
-            margin-bottom: 10px;
-        }
-        .footer-links {
-            margin-top: 20px;
-        }
-        .footer-links a {
-            color: var(--secondary-color);
-            margin: 0 10px;
-        }
-        .footer-links a:hover {
-            text-decoration: underline;
-        }
+    .preloader-text {
+      margin-top: 20px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: .32em;
+      color: var(--gold);
+      text-transform: uppercase;
+      animation: pulse 1.6s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:.35} 50%{opacity:1} }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none; 
-            }
-            .hero-content h1 {
-                font-size: 2.5rem;
-            }
-            .logo {
-                font-size: 22px;
-            }
-        }
-    </style>
+    /* ═══════════════════════════════════════
+       NAVBAR
+    ═══════════════════════════════════════ */
+    nav {
+      position: fixed; top:0; left:0; right:0;
+      background: rgba(30,5,38,.92);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--gold);
+      z-index: 1000;
+      padding: 0 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 72px;
+    }
+    .nav-logo img {
+      height: 52px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 8px var(--gold));
+    }
+    .nav-logo span {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing:.15em;
+      margin-left:12px;
+      vertical-align:middle;
+    }
+    .nav-links { display:flex; gap:32px; list-style:none; }
+    .nav-links a {
+      color: var(--cream);
+      text-decoration: none;
+      font-size:.78rem;
+      font-weight:700;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      position:relative;
+      padding-bottom:4px;
+      transition: color .3s;
+    }
+    .nav-links a::after {
+      content:'';
+      position:absolute; bottom:0; left:0; width:0; height:2px;
+      background:var(--gold);
+      transition: width .3s ease;
+    }
+    .nav-links a:hover { color:var(--gold); }
+    .nav-links a:hover::after { width:100%; }
+    .nav-cta {
+      background: var(--gold);
+      color: var(--royal) !important;
+      padding: 8px 20px;
+      border-radius: 2px;
+      font-weight:700;
+      letter-spacing:.12em;
+      transition: background .3s !important;
+    }
+    .nav-cta:hover { background: var(--gold-lt) !important; }
+    .nav-cta::after { display:none !important; }
+    .hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; }
+    .hamburger span { width:26px; height:2px; background:var(--gold); display:block; }
+
+    /* ═══════════════════════════════════════
+       HERO
+    ═══════════════════════════════════════ */
+    .hero {
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at 70% 40%, rgba(212,175,55,.15) 0%, transparent 60%),
+        radial-gradient(ellipse at 20% 80%, rgba(75,14,78,.6) 0%, transparent 55%),
+        linear-gradient(160deg, var(--dark) 0%, #2a0535 50%, var(--dark) 100%);
+      display: flex; align-items:center; justify-content:center;
+      text-align:center;
+      padding: 120px 24px 60px;
+      position:relative; overflow:hidden;
+    }
+    /* Decorative mandala rings */
+    .hero::before, .hero::after {
+      content:'';
+      position:absolute; border-radius:50%;
+      border:1px solid rgba(212,175,55,.18);
+      pointer-events:none;
+    }
+    .hero::before { width:600px; height:600px; top:50%; left:50%; transform:translate(-50%,-50%); }
+    .hero::after  { width:900px; height:900px; top:50%; left:50%; transform:translate(-50%,-50%); }
+    .hero-badge {
+      display:inline-block;
+      border:1px solid var(--gold);
+      color:var(--gold);
+      font-size:.7rem;
+      letter-spacing:.35em;
+      padding:6px 20px;
+      margin-bottom:24px;
+      text-transform:uppercase;
+    }
+    .hero h1 {
+      font-size: clamp(2.4rem,7vw,5.5rem);
+      font-weight:700;
+      line-height:1.1;
+      background: linear-gradient(135deg,var(--gold) 0%,var(--gold-lt) 50%,var(--gold) 100%);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+      margin-bottom:16px;
+    }
+    .hero p {
+      font-size:1rem;
+      letter-spacing:.12em;
+      color:rgba(253,246,227,.7);
+      max-width:540px; margin:0 auto 40px;
+    }
+    .hero-btns { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
+    .btn-primary {
+      background:var(--gold);
+      color:var(--royal);
+      padding:14px 36px;
+      font-family:var(--font);
+      font-weight:700;
+      font-size:.85rem;
+      letter-spacing:.2em;
+      text-transform:uppercase;
+      border:none; cursor:pointer;
+      clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+      transition: background .3s, transform .2s;
+      text-decoration:none;
+    }
+    .btn-primary:hover { background:var(--gold-lt); transform:translateY(-2px); }
+    .btn-outline {
+      background:transparent;
+      color:var(--gold);
+      padding:13px 36px;
+      font-family:var(--font);
+      font-weight:700;
+      font-size:.85rem;
+      letter-spacing:.2em;
+      text-transform:uppercase;
+      border:1px solid var(--gold); cursor:pointer;
+      clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+      transition: background .3s, transform .2s;
+      text-decoration:none;
+    }
+    .btn-outline:hover { background:rgba(212,175,55,.12); transform:translateY(-2px); }
+    .scroll-hint {
+      position:absolute; bottom:32px; left:50%; transform:translateX(-50%);
+      display:flex; flex-direction:column; align-items:center; gap:8px;
+      color:rgba(212,175,55,.5);
+      font-size:.65rem; letter-spacing:.25em;
+    }
+    .scroll-hint::after {
+      content:'';
+      width:1px; height:40px; background:linear-gradient(var(--gold),transparent);
+      animation: scrollLine 1.8s ease-in-out infinite;
+    }
+    @keyframes scrollLine { 0%,100%{opacity:.3;transform:scaleY(.4)} 50%{opacity:1;transform:scaleY(1)} }
+
+    /* ═══════════════════════════════════════
+       SECTION SHARED
+    ═══════════════════════════════════════ */
+    section { padding:90px 40px; }
+    .section-eyebrow {
+      text-align:center;
+      font-size:.7rem; letter-spacing:.45em;
+      color:var(--gold); text-transform:uppercase;
+      margin-bottom:10px;
+    }
+    .section-title {
+      text-align:center;
+      font-size:clamp(1.6rem,4vw,2.8rem);
+      font-weight:700;
+      color:var(--cream);
+      margin-bottom:12px;
+    }
+    .section-title span { color:var(--gold); }
+    .divider {
+      width:80px; height:2px;
+      background:linear-gradient(90deg,transparent,var(--gold),transparent);
+      margin:0 auto 48px;
+    }
+
+    /* ═══════════════════════════════════════
+       COLLECTIONS GRID
+    ═══════════════════════════════════════ */
+    #collections { background:var(--dark); }
+    .collections-grid {
+      max-width:1200px; margin:0 auto;
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px,1fr));
+      gap:28px;
+    }
+    .product-card {
+      background: linear-gradient(145deg,#2a0535,#1a0320);
+      border:1px solid rgba(212,175,55,.2);
+      overflow:hidden;
+      position:relative;
+      cursor:pointer;
+      transition: transform .35s, box-shadow .35s;
+    }
+    .product-card:hover { transform:translateY(-8px); box-shadow:0 20px 50px rgba(212,175,55,.18); }
+    .product-card-img {
+      width:100%; aspect-ratio:3/4;
+      background:linear-gradient(160deg,rgba(75,14,78,.6),rgba(212,175,55,.08));
+      display:flex; align-items:center; justify-content:center;
+      font-size:4rem;
+      position:relative; overflow:hidden;
+    }
+    .product-card-img::after {
+      content:'';
+      position:absolute; inset:0;
+      background:linear-gradient(to bottom,transparent 60%,rgba(26,3,32,.95));
+    }
+    .card-badge {
+      position:absolute; top:14px; right:14px;
+      background:var(--gold); color:var(--royal);
+      font-size:.65rem; font-weight:700; letter-spacing:.15em;
+      padding:4px 10px; z-index:2;
+    }
+    .product-card-info { padding:20px 18px; }
+    .product-card-info h3 { font-size:.9rem; font-weight:700; letter-spacing:.1em; color:var(--cream); margin-bottom:6px; }
+    .product-card-info p  { font-size:.75rem; color:rgba(253,246,227,.5); letter-spacing:.08em; margin-bottom:12px; }
+    .product-price { color:var(--gold); font-size:1rem; font-weight:700; }
+    .product-price del { color:rgba(253,246,227,.35); font-size:.8rem; margin-right:8px; }
+    .add-to-cart {
+      width:100%; margin-top:14px;
+      background:transparent; border:1px solid rgba(212,175,55,.5);
+      color:var(--gold); font-family:var(--font);
+      font-size:.7rem; letter-spacing:.2em; text-transform:uppercase;
+      padding:10px; cursor:pointer;
+      transition:background .3s,color .3s;
+    }
+    .add-to-cart:hover { background:var(--gold); color:var(--royal); }
+
+    /* ═══════════════════════════════════════
+       CATEGORIES
+    ═══════════════════════════════════════ */
+    #categories { background: linear-gradient(160deg,#200428 0%,#0f0118 100%); }
+    .categories-row {
+      max-width:1100px; margin:0 auto;
+      display:flex; gap:20px; flex-wrap:wrap; justify-content:center;
+    }
+    .cat-tile {
+      flex:1 1 160px; max-width:200px;
+      aspect-ratio:1;
+      background:linear-gradient(145deg,rgba(75,14,78,.7),rgba(26,3,32,.8));
+      border:1px solid rgba(212,175,55,.25);
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center; gap:12px;
+      cursor:pointer;
+      transition:border-color .3s,transform .3s;
+      text-align:center; padding:16px;
+    }
+    .cat-tile:hover { border-color:var(--gold); transform:scale(1.05); }
+    .cat-tile .cat-icon { font-size:2.4rem; }
+    .cat-tile span { font-size:.72rem; font-weight:700; letter-spacing:.18em; color:var(--cream); text-transform:uppercase; }
+
+    /* ═══════════════════════════════════════
+       WHY US
+    ═══════════════════════════════════════ */
+    #why { background:var(--dark); }
+    .why-grid {
+      max-width:1000px; margin:0 auto;
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+      gap:32px;
+    }
+    .why-card {
+      background:linear-gradient(145deg,rgba(75,14,78,.35),rgba(26,3,32,.6));
+      border:1px solid rgba(212,175,55,.15);
+      padding:36px 24px; text-align:center;
+      transition:border-color .3s;
+    }
+    .why-card:hover { border-color:var(--gold); }
+    .why-icon { font-size:2.4rem; margin-bottom:16px; }
+    .why-card h3 { font-size:.85rem; font-weight:700; letter-spacing:.15em; color:var(--gold); margin-bottom:8px; }
+    .why-card p  { font-size:.78rem; color:rgba(253,246,227,.55); line-height:1.8; letter-spacing:.05em; }
+
+    /* ═══════════════════════════════════════
+       TESTIMONIALS
+    ═══════════════════════════════════════ */
+    #testimonials { background:linear-gradient(160deg,#200428,#0f0118); }
+    .testimonials-track {
+      max-width:1100px; margin:0 auto;
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+      gap:24px;
+    }
+    .testi-card {
+      background:linear-gradient(145deg,rgba(75,14,78,.45),rgba(26,3,32,.7));
+      border:1px solid rgba(212,175,55,.2);
+      padding:32px 24px;
+    }
+    .stars { color:var(--gold); font-size:1rem; letter-spacing:3px; margin-bottom:16px; }
+    .testi-card blockquote { font-size:.82rem; line-height:1.9; color:rgba(253,246,227,.7); font-style:italic; margin-bottom:20px; }
+    .testi-author { font-size:.72rem; font-weight:700; letter-spacing:.15em; color:var(--gold); }
+
+    /* ═══════════════════════════════════════
+       CONTACT
+    ═══════════════════════════════════════ */
+    #contact { background:var(--dark); }
+    .contact-inner {
+      max-width:960px; margin:0 auto;
+      display:grid; grid-template-columns:1fr 1fr; gap:60px;
+    }
+    .contact-info h3 {
+      font-size:1.2rem; font-weight:700;
+      color:var(--gold); letter-spacing:.18em;
+      margin-bottom:24px;
+    }
+    .contact-row { display:flex; align-items:flex-start; gap:14px; margin-bottom:22px; }
+    .contact-icon { font-size:1.3rem; flex-shrink:0; margin-top:2px; }
+    .contact-row p { font-size:.82rem; line-height:1.8; color:rgba(253,246,227,.7); letter-spacing:.05em; }
+    .contact-row strong { color:var(--cream); display:block; font-size:.78rem; letter-spacing:.15em; margin-bottom:4px; }
+    .contact-form { display:flex; flex-direction:column; gap:16px; }
+    .form-group { display:flex; flex-direction:column; gap:6px; }
+    .form-group label { font-size:.68rem; letter-spacing:.2em; color:var(--gold); text-transform:uppercase; }
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      background:rgba(75,14,78,.2);
+      border:1px solid rgba(212,175,55,.3);
+      color:var(--cream);
+      font-family:var(--font);
+      font-size:.8rem;
+      padding:12px 16px;
+      outline:none;
+      transition:border-color .3s;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus { border-color:var(--gold); }
+    .form-group textarea { resize:vertical; min-height:110px; }
+    .form-group select option { background:var(--dark); }
+    .btn-submit {
+      background:var(--gold); color:var(--royal);
+      font-family:var(--font); font-weight:700;
+      font-size:.78rem; letter-spacing:.25em;
+      text-transform:uppercase; padding:14px;
+      border:none; cursor:pointer;
+      clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+      transition:background .3s;
+    }
+    .btn-submit:hover { background:var(--gold-lt); }
+
+    /* ═══════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════ */
+    footer {
+      background:linear-gradient(180deg,#1a0520,#0d0115);
+      border-top:1px solid rgba(212,175,55,.2);
+      padding:60px 40px 30px;
+    }
+    .footer-grid {
+      max-width:1100px; margin:0 auto;
+      display:grid; grid-template-columns:2fr 1fr 1fr;
+      gap:48px; padding-bottom:48px;
+      border-bottom:1px solid rgba(212,175,55,.1);
+    }
+    .footer-brand img { height:48px; object-fit:contain; filter:drop-shadow(0 0 6px var(--gold)); margin-bottom:12px; }
+    .footer-brand p { font-size:.78rem; color:rgba(253,246,227,.5); line-height:1.8; margin-bottom:20px; }
+    .social-row { display:flex; gap:12px; }
+    .social-btn {
+      width:36px; height:36px;
+      border:1px solid rgba(212,175,55,.35);
+      display:flex; align-items:center; justify-content:center;
+      font-size:1rem; cursor:pointer; transition:border-color .3s,background .3s;
+      text-decoration:none;
+    }
+    .social-btn:hover { border-color:var(--gold); background:rgba(212,175,55,.1); }
+    .footer-col h4 { font-size:.75rem; letter-spacing:.25em; color:var(--gold); text-transform:uppercase; margin-bottom:18px; }
+    .footer-col ul { list-style:none; display:flex; flex-direction:column; gap:10px; }
+    .footer-col ul a { font-size:.78rem; color:rgba(253,246,227,.5); text-decoration:none; letter-spacing:.07em; transition:color .3s; }
+    .footer-col ul a:hover { color:var(--gold); }
+    .footer-bottom {
+      max-width:1100px; margin:28px auto 0;
+      display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;
+    }
+    .footer-bottom p { font-size:.7rem; color:rgba(253,246,227,.3); letter-spacing:.12em; }
+
+    /* ═══════════════════════════════════════
+       MOBILE NAV
+    ═══════════════════════════════════════ */
+    @media(max-width:768px){
+      .hamburger { display:flex; }
+      .nav-links {
+        position:fixed; top:72px; left:0; right:0;
+        background:rgba(26,5,38,.97);
+        flex-direction:column; align-items:center;
+        padding:32px 0; gap:24px;
+        transform:translateY(-120%);
+        transition:transform .4s ease;
+        border-bottom:1px solid var(--gold);
+      }
+      .nav-links.open { transform:translateY(0); }
+      .contact-inner { grid-template-columns:1fr; }
+      .footer-grid { grid-template-columns:1fr; }
+      section { padding:60px 20px; }
+      nav { padding:0 20px; }
+    }
+
+    /* ═══════════════════════════════════════
+       ENTRANCE ANIMATIONS
+    ═══════════════════════════════════════ */
+    .reveal {
+      opacity:0; transform:translateY(30px);
+      transition: opacity .7s ease, transform .7s ease;
+    }
+    .reveal.visible { opacity:1; transform:none; }
+  </style>
 </head>
 <body>
 
-    <!-- Header / Navigation -->
-    <header>
-        <nav>
-            <div class="logo">GAAYATHRI SAREES</div>
-            <div class="nav-links">
-                <a href="#home">Home</a>
-                <a href="#shop">Collections</a>
-                <a href="#about">Our Story</a>
-                <a href="#contact">Contact</a>
-            </div>
-            <a href="#cart" class="cart-btn">Cart (0)</a>
-        </nav>
-    </header>
+  <!-- ══════════════════════════════════
+       PRELOADER
+  ══════════════════════════════════ -->
+  <div id="preloader">
+    <canvas id="peacockCanvas" width="340" height="340"></canvas>
+    <div class="spinner-ring"></div>
+    <p class="preloader-text">Gaayathri Sarees</p>
+  </div>
 
-    <!-- Hero Section -->
-    <section id="home" class="hero">
-        <div class="hero-content">
-            <h1>Drape Yourself in Elegance</h1>
-            <p>Discover our handpicked collection of authentic Banarasi, Kanjeevaram, Designer, and Cotton sarees woven with tradition and love.</p>
-            <a href="#shop" class="cta-btn">Shop New Arrivals</a>
-        </div>
-    </section>
+  <!-- ══════════════════════════════════
+       NAVBAR
+  ══════════════════════════════════ -->
+  <nav>
+    <a href="#" class="nav-logo" style="display:flex;align-items:center;text-decoration:none;">
+      <img src="images/wideLogo.png" alt="Gaayathri Sarees Logo"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='inline'"/>
+      <span style="display:none;">Gaayathri Sarees</span>
+    </a>
+    <div class="hamburger" id="hamburger" onclick="toggleNav()">
+      <span></span><span></span><span></span>
+    </div>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#collections">Collections</a></li>
+      <li><a href="#categories">Categories</a></li>
+      <li><a href="#why">Why Us</a></li>
+      <li><a href="#testimonials">Reviews</a></li>
+      <li><a href="#contact">Contact</a></li>
+      <li><a href="tel:9666041369" class="nav-cta">📞 Order Now</a></li>
+    </ul>
+  </nav>
 
-    <!-- Shop by Category -->
-    <h2 class="section-title">Shop by Category</h2>
-    <section class="categories">
-        <div class="category-card">
-            <h3>Pure Silk</h3>
-            <p>Timeless Kanjeevaram & Banarasi</p>
-        </div>
-        <div class="category-card">
-            <h3>Daily Cotton</h3>
-            <p>Breathable & Comfortable</p>
-        </div>
-        <div class="category-card">
-            <h3>Designer Wear</h3>
-            <p>Georgette, Chiffon & Fancy Sarees</p>
-        </div>
-        <div class="category-card">
-            <h3>Bridal Collection</h3>
-            <p>Exclusive weaves for your special day</p>
-        </div>
-    </section>
+  <!-- ══════════════════════════════════
+       HERO
+  ══════════════════════════════════ -->
+  <section class="hero" id="home">
+    <div>
+      <div class="hero-badge reveal">Est. in Hyderabad · BHEL Township</div>
+      <h1 class="reveal" style="transition-delay:.1s">Gaayathri<br/>Sarees</h1>
+      <p class="reveal" style="transition-delay:.2s">
+        Exquisite Handlooms &amp; Designer Sarees<br/>
+        crafted for the modern Indian woman
+      </p>
+      <div class="hero-btns reveal" style="transition-delay:.3s">
+        <a href="#collections" class="btn-primary">Explore Collections</a>
+        <a href="#contact" class="btn-outline">Visit Our Store</a>
+      </div>
+    </div>
+    <div class="scroll-hint">Scroll</div>
+  </section>
 
-    <!-- Featured Products Section -->
-    <h2 id="shop" class="section-title">Featured Sarees</h2>
-    <section class="products">
-        <!-- Product 1 -->
-        <div class="product-card">
-            <img src="https://images.unsplash.com/photo-1583391733958-d25e07fac0ec?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Banarasi Silk Saree" class="product-img">
-            <div class="product-info">
-                <h3 class="product-title">Royal Red Banarasi Silk</h3>
-                <p class="product-price">₹8,499</p>
-                <button class="add-to-cart">Add to Cart</button>
-            </div>
-        </div>
+  <!-- ══════════════════════════════════
+       COLLECTIONS
+  ══════════════════════════════════ -->
+  <section id="collections">
+    <p class="section-eyebrow reveal">Curated For You</p>
+    <h2 class="section-title reveal">Our <span>Collections</span></h2>
+    <div class="divider"></div>
+    <div class="collections-grid">
 
-        <!-- Product 2 -->
-        <div class="product-card">
-            <img src="https://images.unsplash.com/photo-1610189013233-02f431b99ff1?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Kanjeevaram Saree" class="product-img">
-            <div class="product-info">
-                <h3 class="product-title">Emerald Green Kanjeevaram</h3>
-                <p class="product-price">₹12,999</p>
-                <button class="add-to-cart">Add to Cart</button>
-            </div>
+      <div class="product-card reveal">
+        <div class="product-card-img">🌸</div>
+        <div class="card-badge">New</div>
+        <div class="product-card-info">
+          <h3>Kanjivaram Silk Saree</h3>
+          <p>Pure Mulberry Silk · Traditional Zari</p>
+          <div class="product-price"><del>₹8,500</del>₹6,499</div>
+          <button class="add-to-cart" onclick="addToCart(this)">Add to Cart</button>
         </div>
+      </div>
 
-        <!-- Product 3 -->
-        <div class="product-card">
-            <img src="https://images.unsplash.com/photo-1583391265517-35bbdadd3df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Cotton Saree" class="product-img">
-            <div class="product-info">
-                <h3 class="product-title">Handloom Indigo Cotton</h3>
-                <p class="product-price">₹2,199</p>
-                <button class="add-to-cart">Add to Cart</button>
-            </div>
+      <div class="product-card reveal" style="transition-delay:.1s">
+        <div class="product-card-img">🦋</div>
+        <div class="card-badge">Bestseller</div>
+        <div class="product-card-info">
+          <h3>Banarasi Georgette</h3>
+          <p>Lightweight · Rich Embroidery</p>
+          <div class="product-price"><del>₹5,200</del>₹3,999</div>
+          <button class="add-to-cart" onclick="addToCart(this)">Add to Cart</button>
         </div>
-    </section>
+      </div>
 
-    <!-- Footer -->
-    <footer id="contact">
-        <p>&copy; 2026 Gaayathri Sarees. All rights reserved.</p>
-        <p>Email: contact@gaayathrisarees.com | Phone: +91 98765 43210</p>
-        <div class="footer-links">
-            <a href="#">Shipping Policy</a> | 
-            <a href="#">Return Policy</a> | 
-            <a href="#">Instagram</a> | 
-            <a href="#">Facebook</a> |
-            <a href="#">YouTube</a>
+      <div class="product-card reveal" style="transition-delay:.2s">
+        <div class="product-card-img">🌺</div>
+        <div class="product-card-info">
+          <h3>Pochampally Ikat</h3>
+          <p>Handwoven · Geometric Patterns</p>
+          <div class="product-price">₹4,299</div>
+          <button class="add-to-cart" onclick="addToCart(this)">Add to Cart</button>
         </div>
-    </footer>
+      </div>
 
+      <div class="product-card reveal" style="transition-delay:.3s">
+        <div class="product-card-img">🌼</div>
+        <div class="card-badge">Sale</div>
+        <div class="product-card-info">
+          <h3>Chanderi Silk Cotton</h3>
+          <p>Sheer · Lightweight Summer</p>
+          <div class="product-price"><del>₹3,800</del>₹2,699</div>
+          <button class="add-to-cart" onclick="addToCart(this)">Add to Cart</button>
+        </div>
+      </div>
+
+      <div class="product-card reveal" style="transition-delay:.1s">
+        <div class="product-card-img">🌹</div>
+        <div class="product-card-info">
+          <h3>Mysore Crepe Silk</h3>
+          <p>Smooth Texture · Vibrant Colours</p>
+          <div class="product-price">₹5,799</div>
+          <button class="add-to-cart" onclick="addToCart(this)">Add to Cart</button>
+        </div>
+      </div>
+
+      <div class="product-card reveal" style="transition-delay:.2s">
+        <div class="product-card-img">🌷</div>
+        <div class="card-badge">New</div>
+        <div class="product-card-info">
+          <h3>Uppada Jamdani</h3>
+          <p>Fine Weave · Festival Special</p>
+          <div class="product-price">₹7,199</div>
+          <button class="add-to-cart" onclick="addToCart(this)">Add to Cart</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════
+       CATEGORIES
+  ══════════════════════════════════ -->
+  <section id="categories">
+    <p class="section-eyebrow reveal">Browse By Style</p>
+    <h2 class="section-title reveal">Shop by <span>Category</span></h2>
+    <div class="divider"></div>
+    <div class="categories-row">
+      <div class="cat-tile reveal"><div class="cat-icon">👰</div><span>Bridal</span></div>
+      <div class="cat-tile reveal" style="transition-delay:.08s"><div class="cat-icon">🪷</div><span>Festive</span></div>
+      <div class="cat-tile reveal" style="transition-delay:.16s"><div class="cat-icon">💼</div><span>Office Wear</span></div>
+      <div class="cat-tile reveal" style="transition-delay:.24s"><div class="cat-icon">🌿</div><span>Daily Wear</span></div>
+      <div class="cat-tile reveal" style="transition-delay:.32s"><div class="cat-icon">✨</div><span>Designer</span></div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════
+       WHY US
+  ══════════════════════════════════ -->
+  <section id="why">
+    <p class="section-eyebrow reveal">The Gaayathri Promise</p>
+    <h2 class="section-title reveal">Why Choose <span>Us?</span></h2>
+    <div class="divider"></div>
+    <div class="why-grid">
+      <div class="why-card reveal">
+        <div class="why-icon">🧵</div>
+        <h3>Authentic Weaves</h3>
+        <p>Direct from master weavers across Telangana, Andhra &amp; beyond.</p>
+      </div>
+      <div class="why-card reveal" style="transition-delay:.1s">
+        <div class="why-icon">💎</div>
+        <h3>Premium Quality</h3>
+        <p>Every saree is quality-checked for fabric, colour &amp; zari purity.</p>
+      </div>
+      <div class="why-card reveal" style="transition-delay:.2s">
+        <div class="why-icon">🚚</div>
+        <h3>Home Delivery</h3>
+        <p>Safe, insured delivery straight to your doorstep across India.</p>
+      </div>
+      <div class="why-card reveal" style="transition-delay:.3s">
+        <div class="why-icon">💬</div>
+        <h3>Personal Styling</h3>
+        <p>WhatsApp us — our experts will help you pick the perfect drape.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════
+       TESTIMONIALS
+  ══════════════════════════════════ -->
+  <section id="testimonials">
+    <p class="section-eyebrow reveal">Happy Customers</p>
+    <h2 class="section-title reveal">What They <span>Say</span></h2>
+    <div class="divider"></div>
+    <div class="testimonials-track">
+      <div class="testi-card reveal">
+        <div class="stars">★★★★★</div>
+        <blockquote>"Bought a Kanjivaram for my wedding — the quality was absolutely stunning. Everyone kept asking where I got it from!"</blockquote>
+        <p class="testi-author">— Priya Reddy, Hyderabad</p>
+      </div>
+      <div class="testi-card reveal" style="transition-delay:.1s">
+        <div class="stars">★★★★★</div>
+        <blockquote>"Best saree shop in BHEL Township. The variety is incredible and the prices are very reasonable. Highly recommended!"</blockquote>
+        <p class="testi-author">— Lakshmi Devi, Ramachandrapuram</p>
+      </div>
+      <div class="testi-card reveal" style="transition-delay:.2s">
+        <div class="stars">★★★★☆</div>
+        <blockquote>"Ordered for Ugadi and received the sarees on time with beautiful packaging. Will definitely order again!"</blockquote>
+        <p class="testi-author">— Sushma Rao, Secunderabad</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════
+       CONTACT
+  ══════════════════════════════════ -->
+  <section id="contact">
+    <p class="section-eyebrow reveal">Get In Touch</p>
+    <h2 class="section-title reveal">Visit or <span>Contact Us</span></h2>
+    <div class="divider"></div>
+    <div class="contact-inner">
+      <div class="contact-info reveal">
+        <h3>Gaayathri Sarees</h3>
+        <div class="contact-row">
+          <div class="contact-icon">📍</div>
+          <p>
+            <strong>Address</strong>
+            Mac Society, Bharat Heavy Electricals Limited,<br/>
+            Ramachandrapuram (BHEL Township),<br/>
+            Hyderabad, Telangana – 502032
+          </p>
+        </div>
+        <div class="contact-row">
+          <div class="contact-icon">📞</div>
+          <p>
+            <strong>Phone / WhatsApp</strong>
+            <a href="tel:9666041369" style="color:var(--gold);text-decoration:none;">+91 9666041369</a>
+          </p>
+        </div>
+        <div class="contact-row">
+          <div class="contact-icon">🕐</div>
+          <p>
+            <strong>Store Hours</strong>
+            Mon – Sat: 10:00 AM – 8:00 PM<br/>
+            Sunday: 11:00 AM – 6:00 PM
+          </p>
+        </div>
+        <div class="contact-row">
+          <div class="contact-icon">🦚</div>
+          <p>
+            <strong>WhatsApp Orders</strong>
+            <a href="https://wa.me/919666041369" target="_blank" style="color:var(--gold);text-decoration:none;">Chat with us on WhatsApp →</a>
+          </p>
+        </div>
+      </div>
+
+      <div class="contact-form reveal" style="transition-delay:.15s">
+        <div class="form-group">
+          <label>Your Name</label>
+          <input type="text" placeholder="Enter your name" id="fname"/>
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" placeholder="+91 XXXXXXXXXX" id="fphone"/>
+        </div>
+        <div class="form-group">
+          <label>Interested In</label>
+          <select id="ftype">
+            <option>Kanjivaram Silk</option>
+            <option>Banarasi</option>
+            <option>Pochampally Ikat</option>
+            <option>Chanderi</option>
+            <option>Bridal Sarees</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Message</label>
+          <textarea placeholder="Tell us what you're looking for…" id="fmsg"></textarea>
+        </div>
+        <button class="btn-submit" onclick="sendWhatsApp()">Send via WhatsApp</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════
+       FOOTER
+  ══════════════════════════════════ -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <img src="images/wideLogo.png" alt="Gaayathri Sarees"
+             onerror="this.style.display='none'"/>
+        <p>
+          Gaayathri Sarees – your trusted destination for authentic handloom &amp;
+          designer sarees in BHEL Township, Hyderabad. Quality, tradition &amp; elegance
+          woven into every thread.
+        </p>
+        <div class="social-row">
+          <a class="social-btn" href="https://wa.me/919666041369" target="_blank" title="WhatsApp">💬</a>
+          <a class="social-btn" href="#" title="Instagram">📸</a>
+          <a class="social-btn" href="#" title="Facebook">📘</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="#home">Home</a></li>
+          <li><a href="#collections">Collections</a></li>
+          <li><a href="#categories">Categories</a></li>
+          <li><a href="#why">About Us</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Saree Types</h4>
+        <ul>
+          <li><a href="#collections">Kanjivaram Silk</a></li>
+          <li><a href="#collections">Banarasi</a></li>
+          <li><a href="#collections">Pochampally Ikat</a></li>
+          <li><a href="#collections">Chanderi</a></li>
+          <li><a href="#collections">Uppada Jamdani</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 Gaayathri Sarees · Mac Society, BHEL Township, Hyderabad 502032</p>
+      <p style="color:rgba(212,175,55,.4);">📞 9666041369</p>
+    </div>
+  </footer>
+
+  <!-- ══════════════════════════════════
+       SCRIPTS
+  ══════════════════════════════════ -->
+  <script>
+    /* ── CANVAS PEACOCK PRELOADER ── */
+    (function() {
+      const canvas = document.getElementById('peacockCanvas');
+      const ctx    = canvas.getContext('2d');
+      const W = 340, H = 340;
+      canvas.width  = W;
+      canvas.height = H;
+
+      // Body pivot point — feathers fan upward from here
+      const BX = W / 2;       // 170
+      const BY = H * 0.68;    // 231  (body center, feathers radiate upward)
+
+      const FEATHER_LEN  = 118;   // full feather length — well within 340px
+      const FEATHER_W    = 11;    // half-width of feather ellipse
+      const EYE_R        = 11;    // eye spot radius
+      const TOTAL        = 16;    // total feathers
+      const SPREAD       = 170;   // total arc in degrees (±85°)
+      const FAN_DURATION = 2200;  // ms to fan all feathers out
+      const HOLD         = 600;   // ms to hold before fade
+
+      // Feather angles: evenly spread, fan from left to right
+      const angles = [];
+      for (let i = 0; i < TOTAL; i++) {
+        // Map 0..TOTAL-1 → -SPREAD/2..+SPREAD/2 degrees
+        // Then offset so feathers point UPWARD (subtract 90° → pointing north)
+        const deg = -SPREAD / 2 + (SPREAD / (TOTAL - 1)) * i - 90;
+        angles.push(deg * Math.PI / 180);
+      }
+
+      // Each feather has its own progress (0→1)
+      const progress = new Array(TOTAL).fill(0);
+      const startTimes = angles.map((_, i) =>
+        (i / (TOTAL - 1)) * (FAN_DURATION * 0.65)   // stagger start across 65% of duration
+      );
+
+      let startTime = null;
+      let phase = 'fan';   // 'fan' | 'hold' | 'done'
+      let holdStart = null;
+
+      function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
+      function drawFeather(angle, prog) {
+        if (prog <= 0) return;
+        const len   = FEATHER_LEN * prog;
+        const eyeDist = len * 0.82;   // eye sits 82% along the feather
+
+        ctx.save();
+        ctx.translate(BX, BY);
+        ctx.rotate(angle);
+
+        // ── Feather stem (thin line) ──
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(0, -len);
+        ctx.strokeStyle = `rgba(180,140,20,${0.5 * prog})`;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // ── Feather body (ellipse) ──
+        const grd = ctx.createLinearGradient(0, 0, 0, -len);
+        grd.addColorStop(0,   `rgba(75,14,78,${0.85 * prog})`);
+        grd.addColorStop(0.4, `rgba(100,20,104,${0.9 * prog})`);
+        grd.addColorStop(0.75,`rgba(0,160,120,${0.85 * prog})`);
+        grd.addColorStop(1,   `rgba(0,200,150,${0.7 * prog})`);
+        ctx.beginPath();
+        ctx.ellipse(0, -len / 2, FEATHER_W * prog, len / 2, 0, 0, Math.PI * 2);
+        ctx.fillStyle = grd;
+        ctx.fill();
+
+        // ── Eye spot (only draw when feather is at least 60% grown) ──
+        if (prog > 0.6) {
+          const eyeProg = (prog - 0.6) / 0.4;  // 0→1 as feather completes
+          const er = EYE_R * eyeProg;
+
+          // Outer glow ring
+          ctx.beginPath();
+          ctx.arc(0, -eyeDist, er + 3, 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(212,175,55,${0.4 * eyeProg})`;
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+
+          // Eye rings (iridescent)
+          const eyeGrd = ctx.createRadialGradient(0, -eyeDist, 0, 0, -eyeDist, er);
+          eyeGrd.addColorStop(0,    `rgba(30,140,255,${eyeProg})`);
+          eyeGrd.addColorStop(0.35, `rgba(0,200,150,${eyeProg})`);
+          eyeGrd.addColorStop(0.65, `rgba(212,175,55,${eyeProg})`);
+          eyeGrd.addColorStop(1,    `rgba(75,14,78,${eyeProg})`);
+          ctx.beginPath();
+          ctx.arc(0, -eyeDist, er, 0, Math.PI * 2);
+          ctx.fillStyle = eyeGrd;
+          ctx.fill();
+
+          // Dark pupil
+          ctx.beginPath();
+          ctx.arc(0, -eyeDist, er * 0.32, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(10,0,20,${eyeProg})`;
+          ctx.fill();
+
+          // Highlight
+          ctx.beginPath();
+          ctx.arc(-er * 0.22, -eyeDist - er * 0.22, er * 0.18, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255,255,255,${0.6 * eyeProg})`;
+          ctx.fill();
+        }
+
+        ctx.restore();
+      }
+
+      function drawBody() {
+        // ── Tail base (connects feathers to body) ──
+        const tailGrd = ctx.createRadialGradient(BX, BY, 5, BX, BY, 38);
+        tailGrd.addColorStop(0,   '#6B1E6E');
+        tailGrd.addColorStop(1,   'rgba(75,14,78,0)');
+        ctx.beginPath();
+        ctx.arc(BX, BY, 38, 0, Math.PI * 2);
+        ctx.fillStyle = tailGrd;
+        ctx.fill();
+
+        // ── Body (main oval) ──
+        const bodyGrd = ctx.createLinearGradient(BX - 22, BY - 20, BX + 22, BY + 36);
+        bodyGrd.addColorStop(0, '#5a1560');
+        bodyGrd.addColorStop(1, '#2a0535');
+        ctx.beginPath();
+        ctx.ellipse(BX, BY + 10, 22, 32, 0, 0, Math.PI * 2);
+        ctx.fillStyle = bodyGrd;
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(212,175,55,0.35)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // ── Neck ──
+        const neckGrd = ctx.createLinearGradient(BX - 7, BY - 40, BX + 7, BY - 10);
+        neckGrd.addColorStop(0, '#1a8080');
+        neckGrd.addColorStop(1, '#0d5050');
+        ctx.beginPath();
+        ctx.ellipse(BX, BY - 24, 7, 20, 0, 0, Math.PI * 2);
+        ctx.fillStyle = neckGrd;
+        ctx.fill();
+
+        // ── Head ──
+        ctx.beginPath();
+        ctx.arc(BX, BY - 50, 14, 0, Math.PI * 2);
+        const headGrd = ctx.createRadialGradient(BX - 3, BY - 54, 2, BX, BY - 50, 14);
+        headGrd.addColorStop(0, '#20a0a0');
+        headGrd.addColorStop(1, '#0d5050');
+        ctx.fillStyle = headGrd;
+        ctx.fill();
+
+        // ── Crest (3 feathers) ──
+        const crestDirs = [[-8, -18], [0, -22], [8, -18]];
+        crestDirs.forEach(([dx, dy]) => {
+          ctx.beginPath();
+          ctx.moveTo(BX, BY - 62);
+          ctx.lineTo(BX + dx, BY - 62 + dy);
+          ctx.strokeStyle = '#D4AF37';
+          ctx.lineWidth = 1.8;
+          ctx.lineCap = 'round';
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(BX + dx, BY - 62 + dy, 3.5, 0, Math.PI * 2);
+          ctx.fillStyle = '#D4AF37';
+          ctx.fill();
+        });
+
+        // ── Eye ──
+        ctx.beginPath();
+        ctx.arc(BX + 5, BY - 52, 4, 0, Math.PI * 2);
+        ctx.fillStyle = 'white';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(BX + 6, BY - 52, 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#0a0014';
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(BX + 5, BY - 54, 1, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,255,255,0.8)';
+        ctx.fill();
+
+        // ── Beak ──
+        ctx.beginPath();
+        ctx.moveTo(BX + 12, BY - 48);
+        ctx.lineTo(BX + 22, BY - 44);
+        ctx.lineTo(BX + 12, BY - 42);
+        ctx.closePath();
+        ctx.fillStyle = '#c8a020';
+        ctx.fill();
+
+        // ── Feet ──
+        [BX - 8, BX + 8].forEach(fx => {
+          ctx.beginPath();
+          ctx.moveTo(fx, BY + 40);
+          ctx.lineTo(fx - 4, BY + 52);
+          ctx.lineTo(fx,     BY + 52);
+          ctx.lineTo(fx + 4, BY + 52);
+          ctx.strokeStyle = '#8B6914';
+          ctx.lineWidth = 2;
+          ctx.lineCap = 'round';
+          ctx.stroke();
+        });
+      }
+
+      function frame(ts) {
+        if (!startTime) startTime = ts;
+        const elapsed = ts - startTime;
+
+        ctx.clearRect(0, 0, W, H);
+
+        if (phase === 'fan') {
+          // Update each feather's progress
+          for (let i = 0; i < TOTAL; i++) {
+            const t = elapsed - startTimes[i];
+            if (t <= 0) {
+              progress[i] = 0;
+            } else {
+              const featherDur = FAN_DURATION * 0.55;
+              progress[i] = Math.min(1, easeOutCubic(t / featherDur));
+            }
+          }
+
+          // Draw feathers BEHIND body
+          for (let i = 0; i < TOTAL; i++) {
+            drawFeather(angles[i], progress[i]);
+          }
+          drawBody();
+
+          // Check if all feathers are fully grown
+          if (progress.every(p => p >= 1)) {
+            phase = 'hold';
+            holdStart = ts;
+          }
+          requestAnimationFrame(frame);
+
+        } else if (phase === 'hold') {
+          // Draw fully fanned peacock
+          for (let i = 0; i < TOTAL; i++) drawFeather(angles[i], 1);
+          drawBody();
+
+          if (ts - holdStart > HOLD) phase = 'done';
+          requestAnimationFrame(frame);
+
+        } else {
+          // done — just keep drawing, preloader will fade via CSS
+          for (let i = 0; i < TOTAL; i++) drawFeather(angles[i], 1);
+          drawBody();
+        }
+      }
+
+      requestAnimationFrame(frame);
+    })();
+
+    /* ── PRELOADER FADE OUT ── */
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const pre = document.getElementById('preloader');
+        pre.classList.add('fade-out');
+        setTimeout(revealOnScroll, 900);
+      }, 3200);
+    });
+
+    /* ── MOBILE NAV TOGGLE ── */
+    function toggleNav() {
+      document.getElementById('navLinks').classList.toggle('open');
+    }
+    // Close nav on link click (mobile)
+    document.querySelectorAll('.nav-links a').forEach(a =>
+      a.addEventListener('click', () =>
+        document.getElementById('navLinks').classList.remove('open')));
+
+    /* ── SCROLL REVEAL ── */
+    function revealOnScroll() {
+      const els = document.querySelectorAll('.reveal');
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+      }, { threshold: 0.12 });
+      els.forEach(el => io.observe(el));
+    }
+    // Also run immediately for elements already in view
+    document.addEventListener('DOMContentLoaded', () => setTimeout(revealOnScroll, 100));
+
+    /* ── ADD TO CART FEEDBACK ── */
+    function addToCart(btn) {
+      const orig = btn.textContent;
+      btn.textContent = '✓ Added!';
+      btn.style.background = 'var(--gold)';
+      btn.style.color = 'var(--royal)';
+      setTimeout(() => {
+        btn.textContent = orig;
+        btn.style.background = '';
+        btn.style.color = '';
+      }, 2000);
+    }
+
+    /* ── WHATSAPP ENQUIRY ── */
+    function sendWhatsApp() {
+      const name  = document.getElementById('fname').value.trim() || 'Customer';
+      const phone = document.getElementById('fphone').value.trim();
+      const type  = document.getElementById('ftype').value;
+      const msg   = document.getElementById('fmsg').value.trim();
+      const text  = `Hello Gaayathri Sarees! 🌸\nName: ${name}\nPhone: ${phone}\nInterested in: ${type}\nMessage: ${msg || 'Please share more details.'}`;
+      window.open('https://wa.me/919666041369?text=' + encodeURIComponent(text), '_blank');
+    }
+  </script>
 </body>
 </html>
