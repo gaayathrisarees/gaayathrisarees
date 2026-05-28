@@ -385,7 +385,18 @@
       text-align:center; padding:16px;
     }
     .cat-tile:hover { border-color:var(--gold); transform:scale(1.05); }
-    .cat-tile .cat-icon { font-size:2.4rem; }
+    .cat-tile .cat-img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 2px solid rgba(212,175,55,0.4);
+      transition: border-color .3s, transform .3s;
+    }
+    .cat-tile:hover .cat-img {
+      border-color: var(--gold);
+      transform: scale(1.08);
+    }
     .cat-tile span { font-size:.72rem; font-weight:700; letter-spacing:.18em; color:var(--cream); text-transform:uppercase; }
 
     /* ═══════════════════════════════════════
@@ -695,11 +706,26 @@
     <h2 class="section-title reveal">Shop by <span>Category</span></h2>
     <div class="divider"></div>
     <div class="categories-row">
-      <div class="cat-tile reveal"><div class="cat-icon">👰</div><span>Bridal</span></div>
-      <div class="cat-tile reveal" style="transition-delay:.08s"><div class="cat-icon">🪷</div><span>Festive</span></div>
-      <div class="cat-tile reveal" style="transition-delay:.16s"><div class="cat-icon">💼</div><span>Office Wear</span></div>
-      <div class="cat-tile reveal" style="transition-delay:.24s"><div class="cat-icon">🌿</div><span>Daily Wear</span></div>
-      <div class="cat-tile reveal" style="transition-delay:.32s"><div class="cat-icon">✨</div><span>Designer</span></div>
+      <div class="cat-tile reveal">
+        <img class="cat-img" src="images/bridal.png" alt="Bridal"/>
+        <span>Bridal</span>
+      </div>
+      <div class="cat-tile reveal" style="transition-delay:.08s">
+        <img class="cat-img" src="images/festive.png" alt="Festive"/>
+        <span>Festive</span>
+      </div>
+      <div class="cat-tile reveal" style="transition-delay:.16s">
+        <img class="cat-img" src="images/office.png" alt="Office Wear"/>
+        <span>Office Wear</span>
+      </div>
+      <div class="cat-tile reveal" style="transition-delay:.24s">
+        <img class="cat-img" src="images/daily.png" alt="Daily Wear"/>
+        <span>Daily Wear</span>
+      </div>
+      <div class="cat-tile reveal" style="transition-delay:.32s">
+        <img class="cat-img" src="images/designer.png" alt="Designer"/>
+        <span>Designer</span>
+      </div>
     </div>
   </section>
 
