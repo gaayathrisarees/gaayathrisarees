@@ -97,12 +97,12 @@
       z-index: 1000;
       padding: 0 40px;
       display: flex; align-items: center; justify-content: space-between;
-      height: 72px;
+      height: 84px;
     }
     .nav-logo img {
-      height: 52px;
+      height: 72px;
       object-fit: contain;
-      filter: drop-shadow(0 0 8px var(--gold));
+      filter: drop-shadow(0 0 12px var(--gold)) drop-shadow(0 0 24px rgba(212,175,55,0.5)) brightness(1.15);
     }
     .nav-logo span {
       font-size: 1.3rem;
@@ -438,7 +438,7 @@
       gap:48px; padding-bottom:48px;
       border-bottom:1px solid rgba(212,175,55,.1);
     }
-    .footer-brand img { height:48px; object-fit:contain; filter:drop-shadow(0 0 6px var(--gold)); margin-bottom:12px; }
+    .footer-brand img { height:64px; object-fit:contain; filter:drop-shadow(0 0 10px var(--gold)) drop-shadow(0 0 20px rgba(212,175,55,0.4)) brightness(1.15); margin-bottom:12px; }
     .footer-brand p { font-size:.78rem; color:rgba(253,246,227,.5); line-height:1.8; margin-bottom:20px; }
     .social-row { display:flex; gap:12px; }
     .social-btn {
@@ -465,7 +465,7 @@
     @media(max-width:768px){
       .hamburger { display:flex; }
       .nav-links {
-        position:fixed; top:72px; left:0; right:0;
+        position:fixed; top:84px; left:0; right:0;
         background:rgba(26,5,38,.97);
         flex-direction:column; align-items:center;
         padding:32px 0; gap:24px;
@@ -496,7 +496,7 @@
        PRELOADER
   ══════════════════════════════════ -->
   <div id="preloader">
-    <canvas id="peacockCanvas" width="340" height="340"></canvas>
+    <canvas id="peacockCanvas" width="480" height="480"></canvas>
     <div class="spinner-ring"></div>
     <p class="preloader-text">Gaayathri Sarees</p>
   </div>
@@ -817,21 +817,21 @@
     (function() {
       const canvas = document.getElementById('peacockCanvas');
       const ctx    = canvas.getContext('2d');
-      const W = 340, H = 340;
+      const W = 480, H = 480;
       canvas.width  = W;
       canvas.height = H;
 
       // Body pivot point — feathers fan upward from here
-      const BX = W / 2;       // 170
-      const BY = H * 0.68;    // 231  (body center, feathers radiate upward)
+      const BX = W / 2;       // 240
+      const BY = H * 0.72;    // 346  (body center, feathers radiate upward)
 
-      const FEATHER_LEN  = 118;   // full feather length — well within 340px
-      const FEATHER_W    = 11;    // half-width of feather ellipse
-      const EYE_R        = 11;    // eye spot radius
-      const TOTAL        = 16;    // total feathers
-      const SPREAD       = 170;   // total arc in degrees (±85°)
-      const FAN_DURATION = 2200;  // ms to fan all feathers out
-      const HOLD         = 600;   // ms to hold before fade
+      const FEATHER_LEN  = 175;   // full feather length
+      const FEATHER_W    = 13;    // half-width of feather ellipse
+      const EYE_R        = 13;    // eye spot radius
+      const TOTAL        = 22;    // total feathers — denser, fuller fan
+      const SPREAD       = 210;   // total arc in degrees (full peacock fan)
+      const FAN_DURATION = 2600;  // ms to fan all feathers out
+      const HOLD         = 800;   // ms to hold before fade
 
       // Feather angles: evenly spread, fan from left to right
       const angles = [];
