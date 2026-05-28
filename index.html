@@ -94,8 +94,13 @@
       z-index: 1;
     }
     #introVideo {
-      width: 100%; height: 100%;
-      object-fit: contain;
+      /* Scale video so its height fills the circle fully —
+         width follows naturally, no black bars, no distortion */
+      position: absolute;
+      top: 50%; left: 50%;
+      width: auto; height: 100%;
+      min-width: 100%;
+      transform: translate(-50%, -50%);
       display: block;
     }
 
