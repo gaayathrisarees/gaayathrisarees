@@ -1047,7 +1047,7 @@
     <p style="font-family:var(--font);font-size:.62rem;letter-spacing:.38em;color:var(--gold);text-transform:uppercase;margin-bottom:14px;">Item Selected</p>
     <!-- Product image preview -->
     <div style="width:120px;height:150px;margin:0 auto 14px;border:2px solid rgba(212,175,55,.4);overflow:hidden;background:rgba(75,14,78,.3);">
-      <img id="cartPopupImg" src="" alt="" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
+      <img id="cartPopupImg" src="" alt="" style="width:100%;height:100%;object-fit:cover;" onerror="this.src='';this.style.opacity='0'"/>
     </div>
     <h3 id="cartPopupItem" style="color:var(--cream);font-family:var(--font);font-size:.88rem;letter-spacing:.1em;margin-bottom:4px;"></h3>
     <p id="cartPopupPrice" style="color:var(--gold);font-family:var(--font);font-size:1rem;font-weight:700;margin-bottom:6px;"></p>
@@ -1325,7 +1325,8 @@
       const prices   = card.querySelector('.product-price').textContent.match(/[\d,]+/g);
       const price    = prices ? parseInt(prices[prices.length - 1].replace(/,/g,'')) : 0;
       const imgEl    = cardWrap ? cardWrap.querySelector('img') : null;
-      const imgSrc   = imgEl ? imgEl.src : '';
+      // getAttribute returns the original relative path (not browser-resolved absolute URL)
+      const imgSrc   = imgEl ? (imgEl.getAttribute('src') || '') : '';
 
       currentItem = { name, price, img: imgSrc, qty: 1 };
 
