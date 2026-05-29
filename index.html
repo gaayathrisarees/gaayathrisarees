@@ -524,25 +524,123 @@
     /* ═══════════════════════════════════════
        MOBILE NAV
     ═══════════════════════════════════════ */
+    /* ═══════════════════════════════════════
+       MOBILE RESPONSIVE — complete overhaul
+    ═══════════════════════════════════════ */
     @media(max-width:768px){
-      .pre-circle { width: 88vw; height: 88vw; }
-      .pre-ring   { width: calc(88vw + 40px); height: calc(88vw + 40px); }
-      .pre-ring-inner { width: calc(88vw + 18px); height: calc(88vw + 18px); }
+
+      /* Preloader */
+      .pre-circle { width: 80vw; height: 80vw; }
+      .pre-ring   { width: calc(80vw + 40px); height: calc(80vw + 40px); }
+      .pre-ring-inner { width: calc(80vw + 18px); height: calc(80vw + 18px); }
+
+      /* Navbar — compact on mobile */
+      nav {
+        height: 64px;
+        padding: 0 16px;
+      }
+      .nav-logo img { height: 54px; }
       .hamburger { display:flex; }
       .nav-links {
-        position:fixed; top:116px; left:0; right:0;
-        background:rgba(26,5,38,.97);
+        position:fixed; top:64px; left:0; right:0;
+        background:rgba(26,5,38,.98);
         flex-direction:column; align-items:center;
-        padding:32px 0; gap:24px;
+        padding:24px 0; gap:20px;
         transform:translateY(-120%);
         transition:transform .4s ease;
         border-bottom:1px solid var(--gold);
+        z-index: 999;
       }
       .nav-links.open { transform:translateY(0); }
+
+      /* Marquee banner — adjust for smaller nav */
+      #marquee-banner { top: 64px !important; }
+      #marquee-banner marquee { font-size: .65rem; }
+
+      /* Hero — mobile optimised */
+      .hero {
+        min-height: 100svh;
+        padding: 110px 20px 80px;
+        align-items: flex-end;
+        background-position: top center !important;
+      }
+      .hero-badge {
+        font-size: .58rem;
+        letter-spacing: .2em;
+        padding: 5px 14px;
+        margin-bottom: 16px;
+        white-space: nowrap;
+      }
+      .hero h1 {
+        font-size: clamp(2.2rem, 11vw, 3.2rem);
+        margin-bottom: 12px;
+      }
+      .hero p {
+        font-size: .82rem;
+        letter-spacing: .07em;
+        margin-bottom: 28px;
+        line-height: 1.7;
+      }
+      .hero-btns {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+      }
+      .btn-primary, .btn-outline {
+        width: 100%;
+        max-width: 280px;
+        font-size: .78rem;
+        padding: 14px 24px;
+        letter-spacing: .16em;
+        text-align: center;
+        display: block;
+      }
+
+      /* Sections */
+      section { padding: 50px 16px; }
+      .section-title { font-size: clamp(1.4rem, 6vw, 2rem); }
+
+      /* Collections grid — 2 columns on mobile */
+      .collections-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+      .product-card-info { padding: 12px 10px; }
+      .product-card-info h3 { font-size: .78rem; }
+      .product-card-info p  { font-size: .65rem; }
+      .product-price { font-size: .85rem; }
+      .add-to-cart { font-size: .62rem; padding: 8px; }
+      .btn-add-cart-icon { font-size: .62rem; padding: 8px 4px; }
+
+      /* Categories */
+      .categories-row { gap: 10px; }
+      .cat-tile { flex: 1 1 130px; max-width: 150px; padding: 12px 8px; }
+      .cat-tile .cat-img { width: 60px; height: 60px; }
+      .cat-tile span { font-size: .62rem; letter-spacing: .1em; }
+
+      /* Why us grid — 2 col */
+      .why-grid { grid-template-columns: repeat(2,1fr); gap: 16px; }
+      .why-card { padding: 24px 16px; }
+      .why-icon { font-size: 1.8rem; margin-bottom: 10px; }
+      .why-card h3 { font-size: .75rem; }
+      .why-card p { font-size: .7rem; }
+
+      /* Contact & Footer */
       .contact-inner { grid-template-columns:1fr; }
-      .footer-grid { grid-template-columns:1fr; }
-      section { padding:60px 20px; }
-      nav { padding:0 20px; }
+      .footer-grid { grid-template-columns:1fr; gap: 28px; }
+      footer { padding: 40px 16px 24px; }
+
+      /* Floating buttons — smaller */
+      #floatingBtns { bottom: 20px; right: 16px; gap: 10px; }
+      #floatingBtns a { width: 46px; height: 46px; }
+    }
+
+    /* Extra small phones */
+    @media(max-width: 390px) {
+      .collections-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .hero h1 { font-size: 2rem; }
+      .cat-tile { flex: 1 1 110px; max-width: 130px; }
     }
 
     /* ═══════════════════════════════════════
@@ -684,7 +782,7 @@
   <!-- ══════════════════════════════════
        MARQUEE BANNER
   ══════════════════════════════════ -->
-  <div style="background:var(--gold);color:var(--royal);font-family:var(--font);font-size:.75rem;font-weight:700;letter-spacing:.22em;padding:7px 0;position:fixed;top:116px;left:0;right:0;z-index:999;overflow:hidden;">
+  <div id="marquee-banner" style="background:var(--gold);color:var(--royal);font-family:var(--font);font-size:.75rem;font-weight:700;letter-spacing:.22em;padding:7px 0;position:fixed;top:116px;left:0;right:0;z-index:999;overflow:hidden;">
     <marquee behavior="scroll" direction="left" scrollamount="5">
       🚧 &nbsp;&nbsp; WEBSITE UNDER WORKING &nbsp;&nbsp; 🚧 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 🚧 &nbsp;&nbsp; WEBSITE UNDER WORKING &nbsp;&nbsp; 🚧 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 🚧 &nbsp;&nbsp; WEBSITE UNDER WORKING &nbsp;&nbsp; 🚧 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 🚧 &nbsp;&nbsp; WEBSITE UNDER WORKING &nbsp;&nbsp; 🚧
     </marquee>
