@@ -198,7 +198,8 @@
       background:
         radial-gradient(ellipse at 70% 40%, rgba(212,175,55,.15) 0%, transparent 60%),
         radial-gradient(ellipse at 20% 80%, rgba(75,14,78,.6) 0%, transparent 55%),
-        linear-gradient(160deg, var(--dark) 0%, #2a0535 50%, var(--dark) 100%);
+        linear-gradient(160deg, rgba(26,5,32,0.82) 0%, rgba(42,5,53,0.78) 50%, rgba(26,5,32,0.82) 100%),
+        url('images/HB.png') center center / cover no-repeat;
       display: flex; align-items:center; justify-content:center;
       text-align:center;
       padding: 150px 24px 60px;
@@ -1360,7 +1361,7 @@
       document.getElementById('orderItemName').textContent  = currentItem.name;
       document.getElementById('orderItemPrice').textContent = '₹' + currentItem.price.toLocaleString('en-IN') + ' each';
       document.getElementById('orderItemQty').textContent   = 'Qty: ' + qty + '  ·  Subtotal: ₹' + total.toLocaleString('en-IN');
-      updatePriceSummary(0);
+      updatePriceSummary(null, '');
       document.getElementById('orderModal').style.display = 'block';
     }
 
@@ -1368,13 +1369,13 @@
       document.getElementById('orderModal').style.display = 'none';
     }
 
-    /* ── DELIVERY CALC (₹2 per km, min ₹30) — km hidden from user ── */
+    /* ── DELIVERY CALC — FREE within 15 km, ₹2/km beyond (min ₹30) — km hidden from user ── */
     const STORE_PINCODE = 502032;
     function estimateKm(pincode) {
-      if (!pincode || pincode.length < 6) return 15;
+      if (!pincode || pincode.length < 6) return null; // unknown
       const diff = Math.abs(parseInt(pincode) - STORE_PINCODE);
       if (diff === 0) return 2;
-      if (diff < 50) return 5;
+      if (diff < 50) return 8;
       if (diff < 200) return 20;
       if (diff < 500) return 50;
       if (diff < 2000) return 150;
@@ -1384,7 +1385,8 @@
     function calcDelivery() {
       const pincode = document.getElementById('oPincode').value.trim();
       const km = estimateKm(pincode);
-      const delivery = Math.max(30, km * 2);
+      if (km === null) { updatePriceSummary(null, pincode); return; }
+      const delivery = km <= 15 ? 0 : Math.max(30, km * 2);
       updatePriceSummary(delivery, pincode);
     }
 
@@ -1397,11 +1399,20 @@
 
       document.getElementById('sumItemPrice').textContent = '₹' + sub.toLocaleString('en-IN') + (qty > 1 ? ' (×' + qty + ')' : '');
       document.getElementById('sumGST').textContent       = '₹' + gst.toLocaleString('en-IN');
-      document.getElementById('sumDelivery').textContent  = delivery ? '₹' + delivery.toLocaleString('en-IN') : (pincode ? '₹' + Math.max(30, estimateKm(pincode)*2).toLocaleString('en-IN') : 'Enter pincode');
-      document.getElementById('sumTotal').textContent     = '₹' + total.toLocaleString('en-IN');
-      document.getElementById('deliveryNote').textContent = delivery
-        ? 'Delivery charge calculated based on your location.'
-        : 'Enter pincode to auto-calculate delivery charges.';
+
+      if (delivery === null) {
+        document.getElementById('sumDelivery').textContent = 'Enter pincode';
+        document.getElementById('deliveryNote').textContent = 'Enter pincode to auto-calculate delivery charges.';
+        document.getElementById('sumTotal').textContent = '₹' + (sub + gst).toLocaleString('en-IN') + ' + delivery';
+      } else if (delivery === 0) {
+        document.getElementById('sumDelivery').textContent = 'FREE 🎉';
+        document.getElementById('deliveryNote').textContent = '✅ You are within 15 km — delivery is FREE!';
+        document.getElementById('sumTotal').textContent = '₹' + total.toLocaleString('en-IN');
+      } else {
+        document.getElementById('sumDelivery').textContent = '₹' + delivery.toLocaleString('en-IN');
+        document.getElementById('deliveryNote').textContent = 'Delivery charges apply (outside 15 km radius).';
+        document.getElementById('sumTotal').textContent = '₹' + total.toLocaleString('en-IN');
+      }
     }
 
     /* ── SUBMIT ORDER ── */
@@ -1424,7 +1435,7 @@
       const sub       = unitPrice * qty;
       const gst       = Math.round(sub * 0.05);
       const km        = estimateKm(pincode);
-      const delivery  = Math.max(30, km * 2);
+      const delivery  = (km === null || km <= 15) ? 0 : Math.max(30, km * 2);
       const total     = sub + gst + delivery;
       const address   = `${door}, ${area}, ${village}${pincode ? ' - ' + pincode : ''}`;
 
@@ -1434,7 +1445,7 @@
         `*Qty:* ${qty}\n` +
         `*Item Price:* ₹${sub.toLocaleString('en-IN')}\n` +
         `*GST (5%):* ₹${gst.toLocaleString('en-IN')}\n` +
-        `*Delivery:* ₹${delivery.toLocaleString('en-IN')}\n` +
+        `*Delivery:* ${delivery === 0 ? 'FREE' : '₹' + delivery.toLocaleString('en-IN')}\n` +
         `*Total:* ₹${total.toLocaleString('en-IN')}\n\n` +
         `👤 *Customer Details*\n` +
         `Name: ${name}\nPhone: ${phone}\n` +
