@@ -718,7 +718,7 @@
     <div class="divider"></div>
     <div class="collections-grid">
 
-      <div class="product-card reveal">
+      <div class="product-card reveal" data-img="images/Kanjivaram.png">
         <div class="product-card-img">
           <img src="images/Kanjivaram.png" alt="Kanjivaram Silk Saree" onerror="this.style.display='none'"/>
         </div>
@@ -731,7 +731,7 @@
         </div>
       </div>
 
-      <div class="product-card reveal" style="transition-delay:.1s">
+      <div class="product-card reveal" style="transition-delay:.1s" data-img="images/Banarasi.png">
         <div class="product-card-img">
           <img src="images/Banarasi.png" alt="Banarasi Georgette" onerror="this.style.display='none'"/>
         </div>
@@ -744,7 +744,7 @@
         </div>
       </div>
 
-      <div class="product-card reveal" style="transition-delay:.2s">
+      <div class="product-card reveal" style="transition-delay:.2s" data-img="images/Pochampally.png">
         <div class="product-card-img">
           <img src="images/Pochampally.png" alt="Pochampally Ikat" onerror="this.style.display='none'"/>
         </div>
@@ -756,7 +756,7 @@
         </div>
       </div>
 
-      <div class="product-card reveal" style="transition-delay:.3s">
+      <div class="product-card reveal" style="transition-delay:.3s" data-img="images/Chanderi.png">
         <div class="product-card-img">
           <img src="images/Chanderi.png" alt="Chanderi Silk Cotton" onerror="this.style.display='none'"/>
         </div>
@@ -769,7 +769,7 @@
         </div>
       </div>
 
-      <div class="product-card reveal" style="transition-delay:.1s">
+      <div class="product-card reveal" style="transition-delay:.1s" data-img="images/Mysore.png">
         <div class="product-card-img">
           <img src="images/Mysore.png" alt="Mysore Crepe Silk" onerror="this.style.display='none'"/>
         </div>
@@ -781,7 +781,7 @@
         </div>
       </div>
 
-      <div class="product-card reveal" style="transition-delay:.2s">
+      <div class="product-card reveal" style="transition-delay:.2s" data-img="images/Uppada.png">
         <div class="product-card-img">
           <img src="images/Uppada.png" alt="Uppada Jamdani" onerror="this.style.display='none'"/>
         </div>
@@ -1045,9 +1045,10 @@
   ══════════════════════════════════ -->
   <div id="cartPopup" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:linear-gradient(145deg,#2a0535,#1a0320);border:1px solid var(--gold);padding:32px 28px;z-index:2000;text-align:center;min-width:320px;max-width:440px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.8);">
     <p style="font-family:var(--font);font-size:.62rem;letter-spacing:.38em;color:var(--gold);text-transform:uppercase;margin-bottom:14px;">Item Selected</p>
-    <!-- Product image preview -->
-    <div style="width:120px;height:150px;margin:0 auto 14px;border:2px solid rgba(212,175,55,.4);overflow:hidden;background:rgba(75,14,78,.3);">
-      <img id="cartPopupImg" src="" alt="" style="width:100%;height:100%;object-fit:cover;" onerror="this.src='';this.style.opacity='0'"/>
+        <!-- Product image preview -->
+    <div style="width:120px;height:150px;margin:0 auto 14px;border:2px solid rgba(212,175,55,.4);overflow:hidden;background:rgba(75,14,78,.3);position:relative;">
+      <img id="cartPopupImg" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:block;"/>
+      <div id="cartPopupEmoji" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;font-size:3.5rem;background:rgba(75,14,78,.4);">🥻</div>
     </div>
     <h3 id="cartPopupItem" style="color:var(--cream);font-family:var(--font);font-size:.88rem;letter-spacing:.1em;margin-bottom:4px;"></h3>
     <p id="cartPopupPrice" style="color:var(--gold);font-family:var(--font);font-size:1rem;font-weight:700;margin-bottom:6px;"></p>
@@ -1266,7 +1267,7 @@
       document.getElementById('catPageTitle').textContent = cat.title;
       const grid = document.getElementById('catPageGrid');
       grid.innerHTML = cat.items.map((item, i) => `
-        <div class="product-card">
+        <div class="product-card" data-img="${item.img}">
           <div class="product-card-img">
             <img src="${item.img}" alt="${item.name}" onerror="this.style.display='none'"/>
           </div>
@@ -1324,9 +1325,9 @@
       const name     = card.querySelector('h3').textContent.trim();
       const prices   = card.querySelector('.product-price').textContent.match(/[\d,]+/g);
       const price    = prices ? parseInt(prices[prices.length - 1].replace(/,/g,'')) : 0;
-      const imgEl    = cardWrap ? cardWrap.querySelector('img') : null;
-      // getAttribute returns the original relative path (not browser-resolved absolute URL)
-      const imgSrc   = imgEl ? (imgEl.getAttribute('src') || '') : '';
+
+      // data-img always has path even when img is hidden by onerror
+      const imgSrc = cardWrap ? (cardWrap.dataset.img || cardWrap.querySelector('img')?.getAttribute('src') || '') : '';
 
       currentItem = { name, price, img: imgSrc, qty: 1 };
 
@@ -1336,8 +1337,19 @@
       btn.style.background = '#2a7a3b';
       setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; }, 2000);
 
-      // Populate popup
-      document.getElementById('cartPopupImg').src   = imgSrc;
+      // Populate popup — set src fresh so browser retries
+      const popupImg   = document.getElementById('cartPopupImg');
+      const popupEmoji = document.getElementById('cartPopupEmoji');
+      popupImg.style.display = 'block';
+      popupImg.style.opacity = '1';
+      if (popupEmoji) popupEmoji.style.display = 'none';
+      popupImg.onerror = function() {
+        this.style.display = 'none';
+        if (popupEmoji) popupEmoji.style.display = 'flex';
+      };
+      popupImg.src = '';        // reset first so browser reloads
+      popupImg.src = imgSrc;
+
       document.getElementById('cartPopupItem').textContent  = name;
       document.getElementById('cartPopupPrice').textContent = '₹' + price.toLocaleString('en-IN');
       document.getElementById('cartQty').textContent = '1';
@@ -1358,7 +1370,11 @@
       currentItem.qty = qty;
       const total = currentItem.price * qty;
 
-      document.getElementById('orderItemImg').src   = currentItem.img;
+      const oImg = document.getElementById('orderItemImg');
+      oImg.style.display = 'block';
+      oImg.onerror = function(){ this.style.display='none'; };
+      oImg.src = '';
+      oImg.src = currentItem.img;
       document.getElementById('orderItemName').textContent  = currentItem.name;
       document.getElementById('orderItemPrice').textContent = '₹' + currentItem.price.toLocaleString('en-IN') + ' each';
       document.getElementById('orderItemQty').textContent   = 'Qty: ' + qty + '  ·  Subtotal: ₹' + total.toLocaleString('en-IN');
