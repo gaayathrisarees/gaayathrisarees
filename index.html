@@ -714,89 +714,137 @@
       transition: background .3s;
     }
     .btn-add-cart-icon:hover { background: var(--gold-lt); }
+    /* ── SAVE BUTTON — bookmark ribbon style ── */
     .btn-save-icon {
-      width: 42px;
-      background: transparent;
-      border: 1px solid rgba(212,175,55,.5);
-      color: var(--gold);
-      font-size: 1.1rem;
+      width: 44px;
+      background: rgba(75,14,78,.4);
+      border: 1px solid rgba(212,175,55,.4);
+      border-radius: 4px;
+      color: rgba(212,175,55,.6);
+      font-size: 1.25rem;
+      line-height: 1;
       cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      transition: background .3s, border-color .3s;
+      transition: all .25s ease;
       position: relative;
+      overflow: hidden;
     }
-    .btn-save-icon:hover { background: rgba(212,175,55,.1); border-color: var(--gold); }
-    .btn-save-icon.saved { color: #ff6b9d; border-color: #ff6b9d; background: rgba(255,107,157,.08); }
+    .btn-save-icon::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,107,157,.15) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity .25s;
+    }
+    .btn-save-icon:hover {
+      border-color: #ff6b9d;
+      color: #ff6b9d;
+      background: rgba(255,107,157,.12);
+      transform: scale(1.08);
+    }
+    .btn-save-icon:hover::before { opacity: 1; }
+    .btn-save-icon.saved {
+      color: #ff6b9d;
+      border-color: #ff6b9d;
+      background: rgba(255,107,157,.15);
+      box-shadow: 0 0 10px rgba(255,107,157,.3);
+    }
+    .btn-save-icon.saved::before { opacity: 1; }
 
     /* ── SAVED ITEMS PANEL ── */
     #savedPanel {
       position: fixed; top: 0; right: 0; bottom: 0;
-      width: 380px; max-width: 95vw;
-      background: linear-gradient(160deg, #2a0535 0%, #1a0320 100%);
-      border-left: 1px solid var(--gold);
+      width: 400px; max-width: 96vw;
+      background: linear-gradient(160deg, #2d0640 0%, #1a0320 100%);
+      border-left: 2px solid var(--gold);
       z-index: 2500;
       display: none;
       flex-direction: column;
-      box-shadow: -8px 0 40px rgba(0,0,0,.7);
+      box-shadow: -12px 0 50px rgba(0,0,0,.8);
+      transform: translateX(100%);
+      transition: transform .35s cubic-bezier(.4,0,.2,1);
+    }
+    #savedPanel.open {
+      transform: translateX(0);
     }
     #savedPanelHeader {
-      padding: 20px 20px 16px;
-      border-bottom: 1px solid rgba(212,175,55,.25);
+      padding: 22px 20px 18px;
+      border-bottom: 1px solid rgba(212,175,55,.3);
       display: flex; align-items: center; justify-content: space-between;
       flex-shrink: 0;
+      background: rgba(75,14,78,.3);
     }
     #savedPanelHeader h3 {
       font-family: var(--font);
       font-size: .88rem;
       font-weight: 700;
       color: var(--gold);
-      letter-spacing: .2em;
+      letter-spacing: .22em;
       text-transform: uppercase;
+      display: flex; align-items: center; gap: 10px;
+    }
+    #savedPanelHeader h3 span.heart-icon {
+      font-size: 1.1rem; color: #ff6b9d;
     }
     #savedItemsList {
-      flex: 1; overflow-y: auto; padding: 0 20px;
+      flex: 1; overflow-y: auto; padding: 0 18px;
     }
     #savedItemsList::-webkit-scrollbar { width: 4px; }
     #savedItemsList::-webkit-scrollbar-track { background: transparent; }
-    #savedItemsList::-webkit-scrollbar-thumb { background: rgba(212,175,55,.3); border-radius: 2px; }
+    #savedItemsList::-webkit-scrollbar-thumb { background: rgba(212,175,55,.35); border-radius: 2px; }
 
-    /* Saved items floating button */
+    /* ── FLOATING SAVED BUTTON ── */
     #savedItemsBtn {
-      position: fixed; top: 50%; right: 0;
+      position: fixed;
+      top: 50%;
+      right: 0;
       transform: translateY(-50%);
-      background: var(--royal);
+      background: linear-gradient(135deg, #6b1870 0%, #4B0E4E 100%);
       border: 1px solid var(--gold);
       border-right: none;
       color: var(--gold);
       font-family: var(--font);
-      font-size: .62rem;
-      letter-spacing: .18em;
+      font-size: .6rem;
+      letter-spacing: .2em;
       text-transform: uppercase;
-      padding: 14px 10px;
+      padding: 18px 9px;
       cursor: pointer;
       z-index: 1300;
-      writing-mode: vertical-rl;
-      transform: translateY(-50%) rotate(180deg);
+      writing-mode: vertical-lr;
+      transform: translateY(-50%);
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 8px;
-      transition: background .3s;
-      border-radius: 0 0 4px 4px;
+      gap: 10px;
+      transition: background .3s, box-shadow .3s;
+      border-radius: 6px 0 0 6px;
+      box-shadow: -3px 0 18px rgba(75,14,78,.5);
     }
-    #savedItemsBtn:hover { background: rgba(75,14,78,.9); }
+    #savedItemsBtn:hover {
+      background: linear-gradient(135deg, #8a2090 0%, #6b1870 100%);
+      box-shadow: -4px 0 24px rgba(212,175,55,.3);
+    }
+    #savedItemsBtn .btn-heart {
+      font-size: 1.1rem;
+      line-height: 1;
+      writing-mode: horizontal-tb;
+      color: #ff6b9d;
+    }
     #savedBadge {
       background: #ff6b9d;
       color: white;
-      font-size: .6rem;
+      font-size: .58rem;
       font-weight: 700;
-      min-width: 18px;
-      height: 18px;
-      border-radius: 50%;
+      min-width: 20px;
+      height: 20px;
+      border-radius: 10px;
       display: none;
       align-items: center;
       justify-content: center;
       font-family: sans-serif;
       writing-mode: horizontal-tb;
+      padding: 0 4px;
+      box-shadow: 0 0 8px rgba(255,107,157,.5);
     }
 
     @media(max-width: 768px) {
@@ -1203,8 +1251,9 @@
        SAVED ITEMS FLOATING BUTTON
   ══════════════════════════════════ -->
   <button id="savedItemsBtn" onclick="openSavedPanel()" title="View Saved Items">
+    <span class="btn-heart">♥</span>
     <span id="savedBadge"></span>
-    ♥ Saved Items
+    Saved
   </button>
 
   <!-- ══════════════════════════════════
@@ -1213,7 +1262,7 @@
   <div id="savedPanelOverlay" onclick="closeSavedPanel()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2499;"></div>
   <div id="savedPanel">
     <div id="savedPanelHeader">
-      <h3>♥ Saved Items</h3>
+      <h3><span class="heart-icon">♥</span> Saved Items</h3>
       <button onclick="closeSavedPanel()" style="background:transparent;border:none;color:var(--gold);font-size:1.3rem;cursor:pointer;line-height:1;">✕</button>
     </div>
     <div id="savedItemsList"></div>
@@ -1267,16 +1316,23 @@
       <h2 style="text-align:center;font-family:var(--font);color:var(--cream);font-size:1.3rem;font-weight:700;letter-spacing:.12em;margin-bottom:4px;">Complete Your Order</h2>
       <div style="width:60px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 28px;"></div>
 
-      <!-- Selected Item Summary -->
-      <div style="background:rgba(75,14,78,.25);border:1px solid rgba(212,175,55,.2);padding:16px 18px;margin-bottom:24px;display:flex;gap:14px;align-items:center;">
-        <div style="width:64px;height:80px;flex-shrink:0;border:1px solid rgba(212,175,55,.3);overflow:hidden;background:rgba(75,14,78,.3);">
-          <img id="orderItemImg" src="" alt="" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
+      <!-- Selected Item Summary — large image -->
+      <div style="background:rgba(75,14,78,.25);border:1px solid rgba(212,175,55,.25);margin-bottom:24px;overflow:hidden;">
+        <!-- Big image banner -->
+        <div style="width:100%;height:200px;overflow:hidden;position:relative;background:rgba(75,14,78,.4);">
+          <img id="orderItemImg" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none'"/>
+          <!-- gradient overlay on image -->
+          <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(26,3,32,.85));pointer-events:none;"></div>
+          <!-- name on image -->
+          <div style="position:absolute;bottom:14px;left:16px;right:16px;">
+            <p style="font-family:var(--font);font-size:.6rem;letter-spacing:.28em;color:var(--gold);text-transform:uppercase;margin-bottom:4px;">Selected Item</p>
+            <p id="orderItemName" style="font-family:var(--font);color:#fff;font-size:1rem;font-weight:700;letter-spacing:.08em;text-shadow:0 2px 8px rgba(0,0,0,.6);"></p>
+          </div>
         </div>
-        <div style="flex:1;">
-          <p style="font-family:var(--font);font-size:.62rem;letter-spacing:.22em;color:var(--gold);text-transform:uppercase;margin-bottom:6px;">Selected Item</p>
-          <p id="orderItemName" style="font-family:var(--font);color:var(--cream);font-size:.88rem;letter-spacing:.08em;margin-bottom:4px;"></p>
-          <p id="orderItemPrice" style="font-family:var(--font);color:var(--gold);font-size:.9rem;font-weight:700;"></p>
-          <p id="orderItemQty" style="font-family:var(--font);color:rgba(253,246,227,.6);font-size:.75rem;margin-top:2px;"></p>
+        <!-- price + qty row below image -->
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;">
+          <p id="orderItemPrice" style="font-family:var(--font);color:var(--gold);font-size:.95rem;font-weight:700;"></p>
+          <p id="orderItemQty" style="font-family:var(--font);color:rgba(253,246,227,.55);font-size:.75rem;"></p>
         </div>
       </div>
 
@@ -1548,59 +1604,24 @@
 
     function openSavedPanel() {
       renderSavedPanel();
-      document.getElementById('savedPanel').style.display = 'flex';
+      const panel = document.getElementById('savedPanel');
+      panel.style.display = 'flex';
+      requestAnimationFrame(() => panel.classList.add('open'));
       document.getElementById('savedPanelOverlay').style.display = 'block';
       document.body.style.overflow = 'hidden';
     }
 
     function closeSavedPanel() {
-      document.getElementById('savedPanel').style.display = 'none';
+      const panel = document.getElementById('savedPanel');
+      panel.classList.remove('open');
+      setTimeout(() => { panel.style.display = 'none'; }, 350);
       document.getElementById('savedPanelOverlay').style.display = 'none';
       document.body.style.overflow = '';
     }
 
-    function changeSavedQty(name, delta) {
-      const item = savedItems.find(s => s.name === name);
-      if (!item) return;
-      item.qty = Math.max(1, item.qty + delta);
-      persistSaved();
-      renderSavedPanel();
-    }
-
-    function removeSavedItem(name) {
-      savedItems = savedItems.filter(s => s.name !== name);
-      persistSaved();
-      updateSavedBadge();
-      renderSavedPanel();
-      /* un-highlight save button on card if visible */
-      document.querySelectorAll('.btn-save-icon.saved').forEach(btn => {
-        const card = btn.closest('.product-card');
-        if (card && card.querySelector('h3')?.textContent.trim() === name) {
-          btn.classList.remove('saved');
-          btn.innerHTML = '♡';
-        }
-      });
-    }
-
-    function orderSavedItem(name) {
-      const item = savedItems.find(s => s.name === name);
-      if (!item) return;
-      currentItem = { name: item.name, price: item.price, img: item.img, qty: item.qty };
-      closeSavedPanel();
-
-      const popupImg = document.getElementById('cartPopupImg');
-      const popupEmoji = document.getElementById('cartPopupEmoji');
-      popupImg.style.display = 'block';
-      popupImg.style.opacity = '1';
-      if (popupEmoji) popupEmoji.style.display = 'none';
-      popupImg.onerror = function() { this.style.display='none'; if(popupEmoji)popupEmoji.style.display='flex'; };
-      popupImg.src = ''; popupImg.src = item.img;
-      document.getElementById('cartPopupItem').textContent  = item.name;
-      document.getElementById('cartPopupPrice').textContent = '₹' + item.price.toLocaleString('en-IN');
-      document.getElementById('cartQty').textContent = item.qty;
-      document.getElementById('cartPopupOverlay').style.display = 'block';
-      document.getElementById('cartPopup').style.display = 'block';
-    }
+    function changeSavedQty(name, delta) { /* handled by event delegation */ }
+    function removeSavedItem(name) { /* handled by event delegation */ }
+    function orderSavedItem(name) { /* handled by event delegation */ }
 
     function renderSavedPanel() {
       const container = document.getElementById('savedItemsList');
@@ -1613,38 +1634,38 @@
           </div>`;
         return;
       }
-      container.innerHTML = savedItems.map(item => `
-        <div style="display:flex;gap:14px;align-items:flex-start;padding:18px 0;border-bottom:1px solid rgba(212,175,55,.12);position:relative;">
+      container.innerHTML = savedItems.map((item, idx) => `
+        <div style="display:flex;gap:14px;align-items:flex-start;padding:16px 0;border-bottom:1px solid rgba(212,175,55,.12);">
           <!-- Image -->
-          <div style="width:72px;height:90px;flex-shrink:0;border:1px solid rgba(212,175,55,.3);overflow:hidden;background:rgba(75,14,78,.3);border-radius:2px;">
+          <div style="width:76px;height:96px;flex-shrink:0;border:1px solid rgba(212,175,55,.35);overflow:hidden;background:rgba(75,14,78,.3);border-radius:3px;">
             <img src="${item.img}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
           </div>
           <!-- Info -->
           <div style="flex:1;min-width:0;">
-            <p style="font-family:var(--font);font-size:.78rem;font-weight:700;color:var(--cream);letter-spacing:.08em;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.name}</p>
-            <p style="font-size:.7rem;color:rgba(253,246,227,.5);margin-bottom:2px;">${item.desc}</p>
-            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
-              <span style="font-size:.68rem;color:rgba(212,175,55,.7);">Colour:</span>
-              <span style="font-family:var(--font);font-size:.68rem;color:var(--gold);">${item.colour}</span>
+            <p style="font-family:var(--font);font-size:.78rem;font-weight:700;color:var(--cream);letter-spacing:.08em;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.name}</p>
+            <p style="font-size:.68rem;color:rgba(253,246,227,.45);margin-bottom:6px;">${item.desc}</p>
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+              <span style="font-size:.65rem;background:rgba(212,175,55,.12);border:1px solid rgba(212,175,55,.25);color:var(--gold);padding:2px 8px;border-radius:20px;letter-spacing:.08em;">🎨 ${item.colour}</span>
             </div>
-            <!-- Qty row -->
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-              <span style="font-size:.65rem;color:rgba(253,246,227,.5);letter-spacing:.15em;">QTY</span>
-              <div style="display:flex;align-items:center;border:1px solid rgba(212,175,55,.35);overflow:hidden;">
-                <button onclick="changeSavedQty('${item.name.replace(/'/g,"\\'")}', -1)" style="width:28px;height:28px;background:rgba(75,14,78,.5);border:none;color:var(--gold);cursor:pointer;font-size:.9rem;">−</button>
-                <span style="min-width:32px;height:28px;display:flex;align-items:center;justify-content:center;background:rgba(75,14,78,.3);color:var(--cream);font-family:var(--font);font-size:.82rem;font-weight:700;">${item.qty}</span>
-                <button onclick="changeSavedQty('${item.name.replace(/'/g,"\\'")}', 1)" style="width:28px;height:28px;background:rgba(75,14,78,.5);border:none;color:var(--gold);cursor:pointer;font-size:.9rem;">+</button>
+            <!-- Qty + Order Now on same row -->
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:.62rem;color:rgba(253,246,227,.45);letter-spacing:.12em;text-transform:uppercase;flex-shrink:0;">Qty</span>
+              <div style="display:flex;align-items:center;border:1px solid rgba(212,175,55,.35);border-radius:3px;overflow:hidden;flex-shrink:0;">
+                <button data-action="qty-minus" data-idx="${idx}" style="width:26px;height:28px;background:rgba(75,14,78,.5);border:none;color:var(--gold);cursor:pointer;font-size:.95rem;line-height:1;">−</button>
+                <span style="min-width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:rgba(75,14,78,.25);color:var(--cream);font-family:var(--font);font-size:.82rem;font-weight:700;">${item.qty}</span>
+                <button data-action="qty-plus" data-idx="${idx}" style="width:26px;height:26px;background:rgba(75,14,78,.5);border:none;color:var(--gold);cursor:pointer;font-size:.95rem;line-height:1;">+</button>
               </div>
-              <span style="color:var(--gold);font-family:var(--font);font-size:.85rem;font-weight:700;">₹${(item.price * item.qty).toLocaleString('en-IN')}</span>
-            </div>
-            <!-- Actions -->
-            <div style="display:flex;gap:8px;">
-              <button onclick="orderSavedItem('${item.name.replace(/'/g,"\\'")}'"
-                style="flex:1;background:var(--gold);border:none;color:var(--royal);font-family:var(--font);font-size:.65rem;font-weight:700;letter-spacing:.15em;padding:8px 10px;cursor:pointer;text-transform:uppercase;">
-                🛒 Order Now
+              <span style="color:var(--gold);font-family:var(--font);font-size:.82rem;font-weight:700;flex-shrink:0;">₹${(item.price * item.qty).toLocaleString('en-IN')}</span>
+              <!-- Order Now inline -->
+              <button data-action="order" data-idx="${idx}"
+                style="flex:1;background:linear-gradient(135deg,#D4AF37,#F0D060);border:none;color:#4B0E4E;font-family:var(--font);font-size:.6rem;font-weight:700;letter-spacing:.12em;padding:0 8px;height:28px;cursor:pointer;text-transform:uppercase;border-radius:2px;white-space:nowrap;min-width:0;">
+                🛒 Order
               </button>
-              <button onclick="removeSavedItem('${item.name.replace(/'/g,"\\'")}'"
-                style="background:transparent;border:1px solid rgba(212,175,55,.3);color:rgba(253,246,227,.5);font-size:.75rem;width:34px;cursor:pointer;" title="Remove">✕</button>
+              <button data-action="remove" data-idx="${idx}"
+                style="background:transparent;border:1px solid rgba(212,175,55,.2);color:rgba(253,246,227,.35);font-size:.75rem;width:28px;height:28px;cursor:pointer;border-radius:2px;flex-shrink:0;"
+                title="Remove"
+                onmouseover="this.style.borderColor='#ff6b9d';this.style.color='#ff6b9d'"
+                onmouseout="this.style.borderColor='rgba(212,175,55,.2)';this.style.color='rgba(253,246,227,.35)'">✕</button>
             </div>
           </div>
         </div>`).join('');
@@ -1654,6 +1675,70 @@
        CART STATE
     ══════════════════════════════════════ */
     let currentItem = { name: '', price: 0, img: '', qty: 1 };
+
+    /* Single delegated listener on the list — handles Order / Remove / Qty */
+    document.getElementById('savedItemsList').addEventListener('click', function(e) {
+      const btn = e.target.closest('[data-action]');
+      if (!btn) return;
+      const idx = parseInt(btn.dataset.idx);
+      const action = btn.dataset.action;
+      if (isNaN(idx) || idx < 0 || idx >= savedItems.length) return;
+
+      if (action === 'order') {
+        const item = savedItems[idx];
+        currentItem = { name: item.name, price: item.price, img: item.img, qty: item.qty };
+        closeSavedPanel();
+        setTimeout(() => {
+          /* ── Go straight to order form (skip cart popup) ── */
+          const qty   = item.qty;
+          const total = item.price * qty;
+
+          /* Populate order form image — large, prominent */
+          const oImg = document.getElementById('orderItemImg');
+          oImg.style.display = 'block';
+          oImg.onerror = function(){ this.style.display='none'; };
+          oImg.src = ''; oImg.src = item.img;
+
+          document.getElementById('orderItemName').textContent  = item.name;
+          document.getElementById('orderItemPrice').textContent = '₹' + item.price.toLocaleString('en-IN') + ' each';
+          document.getElementById('orderItemQty').textContent   = 'Qty: ' + qty + '  ·  Subtotal: ₹' + total.toLocaleString('en-IN');
+          updatePriceSummary(null, '');
+
+          /* Free delivery banner */
+          const bannerText = document.getElementById('freeDeliveryBannerText');
+          const orderNo = getOrderCount();
+          if (orderNo < 2) {
+            const rem = 2 - orderNo;
+            bannerText.textContent = `🎉 FREE delivery on your first 2 orders! ${rem} free order${rem>1?'s':''} remaining.`;
+          } else {
+            bannerText.textContent = `FREE delivery within 30 km of BHEL Township · ₹2/km beyond`;
+          }
+          document.getElementById('freeDeliveryBanner').style.display = 'flex';
+          document.getElementById('orderModal').style.display = 'block';
+        }, 380);
+
+      } else if (action === 'remove') {
+        const removedName = savedItems[idx].name;
+        savedItems.splice(idx, 1);
+        persistSaved();
+        updateSavedBadge();
+        renderSavedPanel();
+        document.querySelectorAll('.btn-save-icon.saved').forEach(b => {
+          const card = b.closest('.product-card');
+          if (card && card.querySelector('h3')?.textContent.trim() === removedName) {
+            b.classList.remove('saved'); b.innerHTML = '♡'; b.title = 'Save item';
+          }
+        });
+
+      } else if (action === 'qty-plus') {
+        savedItems[idx].qty = Math.max(1, savedItems[idx].qty + 1);
+        persistSaved(); renderSavedPanel();
+
+      } else if (action === 'qty-minus') {
+        savedItems[idx].qty = Math.max(1, savedItems[idx].qty - 1);
+        persistSaved(); renderSavedPanel();
+      }
+    });
 
     function changeQty(delta) {
       const qty = Math.max(1, currentItem.qty + delta);
@@ -1716,8 +1801,8 @@
       const oImg = document.getElementById('orderItemImg');
       oImg.style.display = 'block';
       oImg.onerror = function(){ this.style.display='none'; };
-      oImg.src = '';
-      oImg.src = currentItem.img;
+      oImg.src = ''; oImg.src = currentItem.img;
+
       document.getElementById('orderItemName').textContent  = currentItem.name;
       document.getElementById('orderItemPrice').textContent = '₹' + currentItem.price.toLocaleString('en-IN') + ' each';
       document.getElementById('orderItemQty').textContent   = 'Qty: ' + qty + '  ·  Subtotal: ₹' + total.toLocaleString('en-IN');
