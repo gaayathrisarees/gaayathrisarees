@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Gaayathri Sarees – Hyderabad</title>
+  <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/gaayathrisarees/gaayathrisarees/main/images/onlylogo.png"/>
+  <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/gaayathrisarees/gaayathrisarees/main/images/onlylogo.png"/>
 
   <!-- Cinzel Bold from local Fonts folder (repo path) -->
   <style>
@@ -724,7 +726,78 @@
       position: relative;
     }
     .btn-save-icon:hover { background: rgba(212,175,55,.1); border-color: var(--gold); }
-    .btn-save-icon.saved { color: #ff6b9d; border-color: #ff6b9d; }
+    .btn-save-icon.saved { color: #ff6b9d; border-color: #ff6b9d; background: rgba(255,107,157,.08); }
+
+    /* ── SAVED ITEMS PANEL ── */
+    #savedPanel {
+      position: fixed; top: 0; right: 0; bottom: 0;
+      width: 380px; max-width: 95vw;
+      background: linear-gradient(160deg, #2a0535 0%, #1a0320 100%);
+      border-left: 1px solid var(--gold);
+      z-index: 2500;
+      display: none;
+      flex-direction: column;
+      box-shadow: -8px 0 40px rgba(0,0,0,.7);
+    }
+    #savedPanelHeader {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid rgba(212,175,55,.25);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0;
+    }
+    #savedPanelHeader h3 {
+      font-family: var(--font);
+      font-size: .88rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: .2em;
+      text-transform: uppercase;
+    }
+    #savedItemsList {
+      flex: 1; overflow-y: auto; padding: 0 20px;
+    }
+    #savedItemsList::-webkit-scrollbar { width: 4px; }
+    #savedItemsList::-webkit-scrollbar-track { background: transparent; }
+    #savedItemsList::-webkit-scrollbar-thumb { background: rgba(212,175,55,.3); border-radius: 2px; }
+
+    /* Saved items floating button */
+    #savedItemsBtn {
+      position: fixed; top: 50%; right: 0;
+      transform: translateY(-50%);
+      background: var(--royal);
+      border: 1px solid var(--gold);
+      border-right: none;
+      color: var(--gold);
+      font-family: var(--font);
+      font-size: .62rem;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      padding: 14px 10px;
+      cursor: pointer;
+      z-index: 1300;
+      writing-mode: vertical-rl;
+      transform: translateY(-50%) rotate(180deg);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background .3s;
+      border-radius: 0 0 4px 4px;
+    }
+    #savedItemsBtn:hover { background: rgba(75,14,78,.9); }
+    #savedBadge {
+      background: #ff6b9d;
+      color: white;
+      font-size: .6rem;
+      font-weight: 700;
+      min-width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-family: sans-serif;
+      writing-mode: horizontal-tb;
+    }
 
     @media(max-width: 768px) {
       .cat-page-grid { padding: 24px 16px 80px; }
@@ -947,7 +1020,7 @@
       <div class="why-card reveal" style="transition-delay:.2s">
         <div class="why-icon">🚚</div>
         <h3>Home Delivery</h3>
-        <p>Safe, insured delivery straight to your doorstep across India.</p>
+        <p>Safe delivery across India. <strong style="color:var(--gold);">FREE</strong> within 30 km of BHEL Township. First 2 orders always free!</p>
       </div>
       <div class="why-card reveal" style="transition-delay:.3s">
         <div class="why-icon">💬</div>
@@ -1127,7 +1200,26 @@
   </div>
 
   <!-- ══════════════════════════════════
-       FLOATING CALL & WHATSAPP BUTTONS
+       SAVED ITEMS FLOATING BUTTON
+  ══════════════════════════════════ -->
+  <button id="savedItemsBtn" onclick="openSavedPanel()" title="View Saved Items">
+    <span id="savedBadge"></span>
+    ♥ Saved Items
+  </button>
+
+  <!-- ══════════════════════════════════
+       SAVED ITEMS PANEL
+  ══════════════════════════════════ -->
+  <div id="savedPanelOverlay" onclick="closeSavedPanel()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:2499;"></div>
+  <div id="savedPanel">
+    <div id="savedPanelHeader">
+      <h3>♥ Saved Items</h3>
+      <button onclick="closeSavedPanel()" style="background:transparent;border:none;color:var(--gold);font-size:1.3rem;cursor:pointer;line-height:1;">✕</button>
+    </div>
+    <div id="savedItemsList"></div>
+  </div>
+
+  <!-- ══════════════════════════════════
   ══════════════════════════════════ -->
   <div id="floatingBtns" style="position:fixed;bottom:28px;right:24px;display:flex;flex-direction:column;gap:12px;z-index:1200;">
     <a href="tel:9666041369" title="Call Us" style="width:52px;height:52px;border-radius:50%;background:#4B0E4E;border:2px solid #D4AF37;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(75,14,78,.6);text-decoration:none;transition:transform .2s;" onmouseover="this.style.transform='scale(1.12)'" onmouseout="this.style.transform='scale(1)'">
@@ -1232,6 +1324,12 @@
         </div>
       </div>
 
+      <!-- Delivery promo banner -->
+      <div id="freeDeliveryBanner" style="background:rgba(46,120,59,.18);border:1px solid rgba(46,200,80,.3);padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;gap:10px;border-radius:2px;">
+        <span style="font-size:1.2rem;">🎁</span>
+        <span id="freeDeliveryBannerText" style="font-family:var(--font);font-size:.7rem;color:#6ddc82;letter-spacing:.1em;"></span>
+      </div>
+
       <!-- Price Summary -->
       <div style="background:rgba(212,175,55,.07);border:1px solid rgba(212,175,55,.25);padding:18px 20px;margin-bottom:22px;">
         <p style="font-family:var(--font);font-size:.65rem;letter-spacing:.25em;color:var(--gold);text-transform:uppercase;margin-bottom:14px;">Price Details</p>
@@ -1295,7 +1393,10 @@
       }, { threshold: 0.12 });
       els.forEach(el => io.observe(el));
     }
-    document.addEventListener('DOMContentLoaded', () => setTimeout(revealOnScroll, 100));
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(revealOnScroll, 100);
+      updateSavedBadge();
+    });
 
     /* ══════════════════════════════════════
        CATEGORY DATA
@@ -1382,8 +1483,8 @@
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zm-9.83-3.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.86-7.01L19.42 4h-.01l-1.1 2-2.76 5H8.53l-.13-.27L6.16 6l-.95-2-.94-2H1v2h2l3.6 7.59L5.25 16c-.16.28-.25.61-.25.96C5 18.1 5.9 19 7 19h12v-2H7.42c-.13 0-.25-.11-.25-.25z"/></svg>
                 Add to Cart
               </button>
-              <button class="btn-save-icon" onclick="toggleSave(this)" title="Save">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+              <button class="btn-save-icon${savedItems.find(s=>s.name===item.name)?` saved`:``}" onclick="toggleSave(this)" title="${savedItems.find(s=>s.name===item.name)?`Saved! Click to unsave`:`Save item`}">
+                ${savedItems.find(s=>s.name===item.name)?`♥`:`♡`}
               </button>
             </div>
           </div>
@@ -1401,8 +1502,152 @@
       document.body.style.overflow = '';
     }
 
+    /* ══════════════════════════════════════
+       SAVED ITEMS STATE
+    ══════════════════════════════════════ */
+    let savedItems = JSON.parse(localStorage.getItem('gsSavedItems') || '[]');
+
+    function persistSaved() {
+      localStorage.setItem('gsSavedItems', JSON.stringify(savedItems));
+    }
+
     function toggleSave(btn) {
-      btn.classList.toggle('saved');
+      const card = btn.closest('.product-card');
+      const info = card.querySelector('.product-card-info');
+      const name  = info.querySelector('h3').textContent.trim();
+      const desc  = info.querySelector('p') ? info.querySelector('p').textContent.trim() : '';
+      const priceEl = info.querySelector('.product-price');
+      const prices  = priceEl ? priceEl.textContent.match(/[\d,]+/g) : null;
+      const price   = prices ? parseInt(prices[prices.length-1].replace(/,/g,'')) : 0;
+      const img     = card.dataset.img || card.querySelector('img')?.getAttribute('src') || '';
+      /* Extract colour hint from description (e.g. "Red · Silk") */
+      const colourMatch = desc.match(/([A-Z][a-z]+(?:\s[A-Z][a-z]+)?)\s·/);
+      const colour = colourMatch ? colourMatch[1] : '—';
+
+      const idx = savedItems.findIndex(s => s.name === name);
+      if (idx === -1) {
+        savedItems.push({ name, desc, price, img, colour, qty: 1 });
+        btn.classList.add('saved');
+        btn.innerHTML = '♥';
+        btn.title = 'Saved! Click to unsave';
+      } else {
+        savedItems.splice(idx, 1);
+        btn.classList.remove('saved');
+        btn.innerHTML = '♡';
+        btn.title = 'Save item';
+      }
+      persistSaved();
+      updateSavedBadge();
+    }
+
+    function updateSavedBadge() {
+      const badge = document.getElementById('savedBadge');
+      if (badge) badge.textContent = savedItems.length || '';
+      badge && (badge.style.display = savedItems.length ? 'flex' : 'none');
+    }
+
+    function openSavedPanel() {
+      renderSavedPanel();
+      document.getElementById('savedPanel').style.display = 'flex';
+      document.getElementById('savedPanelOverlay').style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeSavedPanel() {
+      document.getElementById('savedPanel').style.display = 'none';
+      document.getElementById('savedPanelOverlay').style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    function changeSavedQty(name, delta) {
+      const item = savedItems.find(s => s.name === name);
+      if (!item) return;
+      item.qty = Math.max(1, item.qty + delta);
+      persistSaved();
+      renderSavedPanel();
+    }
+
+    function removeSavedItem(name) {
+      savedItems = savedItems.filter(s => s.name !== name);
+      persistSaved();
+      updateSavedBadge();
+      renderSavedPanel();
+      /* un-highlight save button on card if visible */
+      document.querySelectorAll('.btn-save-icon.saved').forEach(btn => {
+        const card = btn.closest('.product-card');
+        if (card && card.querySelector('h3')?.textContent.trim() === name) {
+          btn.classList.remove('saved');
+          btn.innerHTML = '♡';
+        }
+      });
+    }
+
+    function orderSavedItem(name) {
+      const item = savedItems.find(s => s.name === name);
+      if (!item) return;
+      currentItem = { name: item.name, price: item.price, img: item.img, qty: item.qty };
+      closeSavedPanel();
+
+      const popupImg = document.getElementById('cartPopupImg');
+      const popupEmoji = document.getElementById('cartPopupEmoji');
+      popupImg.style.display = 'block';
+      popupImg.style.opacity = '1';
+      if (popupEmoji) popupEmoji.style.display = 'none';
+      popupImg.onerror = function() { this.style.display='none'; if(popupEmoji)popupEmoji.style.display='flex'; };
+      popupImg.src = ''; popupImg.src = item.img;
+      document.getElementById('cartPopupItem').textContent  = item.name;
+      document.getElementById('cartPopupPrice').textContent = '₹' + item.price.toLocaleString('en-IN');
+      document.getElementById('cartQty').textContent = item.qty;
+      document.getElementById('cartPopupOverlay').style.display = 'block';
+      document.getElementById('cartPopup').style.display = 'block';
+    }
+
+    function renderSavedPanel() {
+      const container = document.getElementById('savedItemsList');
+      if (!savedItems.length) {
+        container.innerHTML = `
+          <div style="text-align:center;padding:60px 20px;color:rgba(253,246,227,.4);">
+            <div style="font-size:3rem;margin-bottom:16px;">♡</div>
+            <p style="font-family:var(--font);font-size:.8rem;letter-spacing:.2em;">No saved items yet</p>
+            <p style="font-size:.7rem;margin-top:8px;opacity:.6;">Tap ♡ on any saree to save it here</p>
+          </div>`;
+        return;
+      }
+      container.innerHTML = savedItems.map(item => `
+        <div style="display:flex;gap:14px;align-items:flex-start;padding:18px 0;border-bottom:1px solid rgba(212,175,55,.12);position:relative;">
+          <!-- Image -->
+          <div style="width:72px;height:90px;flex-shrink:0;border:1px solid rgba(212,175,55,.3);overflow:hidden;background:rgba(75,14,78,.3);border-radius:2px;">
+            <img src="${item.img}" alt="${item.name}" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display='none'"/>
+          </div>
+          <!-- Info -->
+          <div style="flex:1;min-width:0;">
+            <p style="font-family:var(--font);font-size:.78rem;font-weight:700;color:var(--cream);letter-spacing:.08em;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.name}</p>
+            <p style="font-size:.7rem;color:rgba(253,246,227,.5);margin-bottom:2px;">${item.desc}</p>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <span style="font-size:.68rem;color:rgba(212,175,55,.7);">Colour:</span>
+              <span style="font-family:var(--font);font-size:.68rem;color:var(--gold);">${item.colour}</span>
+            </div>
+            <!-- Qty row -->
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+              <span style="font-size:.65rem;color:rgba(253,246,227,.5);letter-spacing:.15em;">QTY</span>
+              <div style="display:flex;align-items:center;border:1px solid rgba(212,175,55,.35);overflow:hidden;">
+                <button onclick="changeSavedQty('${item.name.replace(/'/g,"\\'")}', -1)" style="width:28px;height:28px;background:rgba(75,14,78,.5);border:none;color:var(--gold);cursor:pointer;font-size:.9rem;">−</button>
+                <span style="min-width:32px;height:28px;display:flex;align-items:center;justify-content:center;background:rgba(75,14,78,.3);color:var(--cream);font-family:var(--font);font-size:.82rem;font-weight:700;">${item.qty}</span>
+                <button onclick="changeSavedQty('${item.name.replace(/'/g,"\\'")}', 1)" style="width:28px;height:28px;background:rgba(75,14,78,.5);border:none;color:var(--gold);cursor:pointer;font-size:.9rem;">+</button>
+              </div>
+              <span style="color:var(--gold);font-family:var(--font);font-size:.85rem;font-weight:700;">₹${(item.price * item.qty).toLocaleString('en-IN')}</span>
+            </div>
+            <!-- Actions -->
+            <div style="display:flex;gap:8px;">
+              <button onclick="orderSavedItem('${item.name.replace(/'/g,"\\'")}'"
+                style="flex:1;background:var(--gold);border:none;color:var(--royal);font-family:var(--font);font-size:.65rem;font-weight:700;letter-spacing:.15em;padding:8px 10px;cursor:pointer;text-transform:uppercase;">
+                🛒 Order Now
+              </button>
+              <button onclick="removeSavedItem('${item.name.replace(/'/g,"\\'")}'"
+                style="background:transparent;border:1px solid rgba(212,175,55,.3);color:rgba(253,246,227,.5);font-size:.75rem;width:34px;cursor:pointer;" title="Remove">✕</button>
+            </div>
+          </div>
+        </div>`).join('');
     }
 
     /* ══════════════════════════════════════
@@ -1477,6 +1722,17 @@
       document.getElementById('orderItemPrice').textContent = '₹' + currentItem.price.toLocaleString('en-IN') + ' each';
       document.getElementById('orderItemQty').textContent   = 'Qty: ' + qty + '  ·  Subtotal: ₹' + total.toLocaleString('en-IN');
       updatePriceSummary(null, '');
+      /* Show free delivery promo banner */
+      const bannerText = document.getElementById('freeDeliveryBannerText');
+      const orderNo = getOrderCount();
+      if (orderNo < 2) {
+        const rem = 2 - orderNo;
+        bannerText.textContent = `🎉 FREE delivery on your first 2 orders! You have ${rem} free order${rem>1?'s':''} remaining.`;
+        document.getElementById('freeDeliveryBanner').style.display = 'flex';
+      } else {
+        bannerText.textContent = `FREE delivery within 30 km of BHEL Township · ₹2/km beyond`;
+        document.getElementById('freeDeliveryBanner').style.display = 'flex';
+      }
       document.getElementById('orderModal').style.display = 'block';
     }
 
@@ -1484,15 +1740,33 @@
       document.getElementById('orderModal').style.display = 'none';
     }
 
-    /* ── DELIVERY CALC — FREE within 15 km, ₹2/km beyond (min ₹30) — km hidden from user ── */
+    /* ── DELIVERY CALC — BHEL (502032) prime location, FREE within 30 km ── */
+    /* ── ₹2 per km beyond 30 km · First 2 orders FREE delivery ── */
     const STORE_PINCODE = 502032;
+    const FREE_DELIVERY_RADIUS_KM = 30;
+    const RATE_PER_KM = 2;
+
+    /* Track order count in localStorage */
+    function getOrderCount() {
+      return parseInt(localStorage.getItem('gsOrderCount') || '0');
+    }
+    function incrementOrderCount() {
+      const c = getOrderCount() + 1;
+      localStorage.setItem('gsOrderCount', c);
+      return c;
+    }
+    function isFirstTwoOrders() {
+      return getOrderCount() < 2;
+    }
+
     function estimateKm(pincode) {
-      if (!pincode || pincode.length < 6) return null; // unknown
+      if (!pincode || pincode.length < 6) return null;
       const diff = Math.abs(parseInt(pincode) - STORE_PINCODE);
       if (diff === 0) return 2;
-      if (diff < 50) return 8;
-      if (diff < 200) return 20;
-      if (diff < 500) return 50;
+      if (diff < 30)  return 5;
+      if (diff < 80)  return 18;
+      if (diff < 200) return 35;
+      if (diff < 500) return 60;
       if (diff < 2000) return 150;
       return 400;
     }
@@ -1501,16 +1775,20 @@
       const pincode = document.getElementById('oPincode').value.trim();
       const km = estimateKm(pincode);
       if (km === null) { updatePriceSummary(null, pincode); return; }
-      const delivery = km <= 15 ? 0 : Math.max(30, km * 2);
-      updatePriceSummary(delivery, pincode);
+      /* Free if within 30 km OR first 2 orders */
+      const delivery = (km <= FREE_DELIVERY_RADIUS_KM || isFirstTwoOrders())
+        ? 0
+        : km * RATE_PER_KM;
+      updatePriceSummary(delivery, pincode, km);
     }
 
-    function updatePriceSummary(delivery, pincode) {
+    function updatePriceSummary(delivery, pincode, km) {
       const unitPrice = currentItem.price || 0;
       const qty   = currentItem.qty  || 1;
       const sub   = unitPrice * qty;
       const gst   = Math.round(sub * 0.05);
       const total = sub + gst + (delivery || 0);
+      const orderNo = getOrderCount();
 
       document.getElementById('sumItemPrice').textContent = '₹' + sub.toLocaleString('en-IN') + (qty > 1 ? ' (×' + qty + ')' : '');
       document.getElementById('sumGST').textContent       = '₹' + gst.toLocaleString('en-IN');
@@ -1521,11 +1799,21 @@
         document.getElementById('sumTotal').textContent = '₹' + (sub + gst).toLocaleString('en-IN') + ' + delivery';
       } else if (delivery === 0) {
         document.getElementById('sumDelivery').textContent = 'FREE 🎉';
-        document.getElementById('deliveryNote').textContent = '✅ You are within 15 km — delivery is FREE!';
+        let note = '';
+        if (orderNo < 2) {
+          const remaining = 2 - orderNo;
+          note = `🎁 Free delivery on your first 2 orders! (${remaining} free order${remaining>1?'s':''} remaining)`;
+        } else if (km !== undefined && km <= FREE_DELIVERY_RADIUS_KM) {
+          note = `✅ Within 30 km of BHEL Township — FREE delivery!`;
+        } else {
+          note = '✅ FREE delivery applied!';
+        }
+        document.getElementById('deliveryNote').textContent = note;
         document.getElementById('sumTotal').textContent = '₹' + total.toLocaleString('en-IN');
       } else {
         document.getElementById('sumDelivery').textContent = '₹' + delivery.toLocaleString('en-IN');
-        document.getElementById('deliveryNote').textContent = 'Delivery charges apply (outside 15 km radius).';
+        const perKmNote = km ? ` (${km} km × ₹${RATE_PER_KM}/km)` : '';
+        document.getElementById('deliveryNote').textContent = `Delivery charges: ₹${RATE_PER_KM}/km beyond 30 km radius${perKmNote}.`;
         document.getElementById('sumTotal').textContent = '₹' + total.toLocaleString('en-IN');
       }
     }
@@ -1550,7 +1838,7 @@
       const sub       = unitPrice * qty;
       const gst       = Math.round(sub * 0.05);
       const km        = estimateKm(pincode);
-      const delivery  = (km === null || km <= 15) ? 0 : Math.max(30, km * 2);
+      const delivery  = (km === null || km <= FREE_DELIVERY_RADIUS_KM || isFirstTwoOrders()) ? 0 : km * RATE_PER_KM;
       const total     = sub + gst + delivery;
       const address   = `${door}, ${area}, ${village}${pincode ? ' - ' + pincode : ''}`;
 
@@ -1577,6 +1865,7 @@
         `Address: ${address}`
       );
 
+      incrementOrderCount();
       window.open('https://wa.me/919666041369?text=' + encodeURIComponent(waText), '_blank');
       setTimeout(() => {
         window.open(`mailto:gaayathrisarees@gmail.com?subject=${subject}&body=${body}`, '_blank');
