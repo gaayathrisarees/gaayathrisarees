@@ -140,7 +140,7 @@
       background: rgba(30,5,38,.92);
       backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--gold);
-      z-index: 1000;
+      z-index: 1600;
       padding: 0 40px;
       display: flex; align-items: center; justify-content: space-between;
       height: 116px;
@@ -654,31 +654,18 @@
       background: var(--dark);
       z-index: 1500;
       overflow-y: auto;
-      padding-top: 60px;
+      padding-top: 200px;
     }
     #categoryPage.active { display: block; }
     .cat-page-header {
       background: linear-gradient(135deg, #2a0535 0%, #1a0320 100%);
       border-bottom: 1px solid var(--gold);
-      padding: 20px 40px;
+      padding: 14px 40px;
       display: flex; align-items: center; justify-content: space-between;
-      position: sticky; top: 0; z-index: 10;
-    }
-    .cat-header-logo {
-      display: flex; align-items: center; gap: 12px;
-      text-decoration: none;
-    }
-    .cat-header-logo img {
-      height: 54px;
-      object-fit: contain;
-    }
-    .cat-header-logo-name {
-      font-family: var(--font);
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--gold);
-      letter-spacing: .18em;
-      text-transform: uppercase;
+      position: fixed;
+      top: 150px;
+      left: 0; right: 0;
+      z-index: 1501;
     }
     .cat-back-btn {
       background: transparent;
@@ -867,10 +854,9 @@
 
     @media(max-width: 768px) {
       .cat-page-grid { padding: 24px 16px 80px; }
-      .cat-page-header { padding: 12px 16px; gap: 8px; }
-      .cat-page-title { font-size: .85rem; }
-      .cat-header-logo img { height: 38px; }
-      .cat-header-logo-name { font-size: .78rem; }
+      .cat-page-header { top: 92px; padding: 10px 16px; }
+      #categoryPage { padding-top: 140px; }
+      .cat-page-title { font-size: .9rem; }
       .cat-back-btn { font-size: .62rem; padding: 7px 12px; }
     }
 
@@ -927,7 +913,7 @@
   <!-- ══════════════════════════════════
        MARQUEE BANNER
   ══════════════════════════════════ -->
-  <div id="marquee-banner" style="background:var(--gold);color:var(--royal);font-family:var(--font);font-size:.75rem;font-weight:700;letter-spacing:.22em;padding:7px 0;position:fixed;top:116px;left:0;right:0;z-index:999;overflow:hidden;">
+  <div id="marquee-banner" style="background:var(--gold);color:var(--royal);font-family:var(--font);font-size:.75rem;font-weight:700;letter-spacing:.22em;padding:7px 0;position:fixed;top:116px;left:0;right:0;z-index:1599;overflow:hidden;">
     <marquee behavior="scroll" direction="left" scrollamount="5">
       🚧 &nbsp;&nbsp; WEBSITE UNDER WORKING &nbsp;&nbsp; 🚧 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 🚧 &nbsp;&nbsp; WEBSITE UNDER WORKING &nbsp;&nbsp; 🚧 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 🚧 &nbsp;&nbsp; WEBSITE UNDER WORKING &nbsp;&nbsp; 🚧 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 🚧 &nbsp;&nbsp; WEBSITE UNDER WORKING &nbsp;&nbsp; 🚧
     </marquee>
@@ -1260,18 +1246,15 @@
   ══════════════════════════════════ -->
   <div id="categoryPage">
     <div class="cat-page-header">
-      <!-- Logo + Brand Name on left -->
-      <a href="#" class="cat-header-logo" onclick="closeCategory(); return false;">
-        <img src="images/wideLogo.png" alt="Gaayathri Sarees Logo" onerror="this.style.display='none'"/>
-        <span class="cat-header-logo-name">Ravali</span>
-      </a>
-      <!-- Category Title in center -->
-      <h2 class="cat-page-title" id="catPageTitle">Bridal Wear</h2>
-      <!-- Back button on right -->
+      <!-- Back button LEFT -->
       <button class="cat-back-btn" onclick="closeCategory()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
         Back to Main
       </button>
+      <!-- Category Title CENTER -->
+      <h2 class="cat-page-title" id="catPageTitle">Bridal Wear</h2>
+      <!-- Empty right spacer to keep title centered -->
+      <div style="width:140px;"></div>
     </div>
     <div class="cat-page-grid" id="catPageGrid">
       <!-- Populated by JS -->
