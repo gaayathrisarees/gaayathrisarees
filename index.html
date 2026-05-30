@@ -27,6 +27,24 @@
   <!-- Google Fonts fallback for Cinzel -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <!-- jsPDF for invoice generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- EmailJS — sends email directly without mail client -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script>
+    // ── EmailJS config — replace with your actual keys ──
+    // Sign up free at https://www.emailjs.com
+    // Service ID  → your Gmail service
+    // Template ID → your order template
+    // Public Key  → your account public key
+    const EMAILJS_SERVICE_ID  = 'YOUR_SERVICE_ID';   // e.g. 'service_abc123'
+    const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';  // e.g. 'template_xyz789'
+    const EMAILJS_PUBLIC_KEY  = 'YOUR_PUBLIC_KEY';   // e.g. 'abcXYZ123'
+
+    (function(){
+      emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+    })();
+  </script>
 
   <style>
     /* ═══════════════════════════════════════
@@ -1921,8 +1939,8 @@
       }
     }
 
-    /* ── SUBMIT ORDER ── */
-    function submitOrder() {
+    /* ── GENERATE INVOICE PDF & SUBMIT ORDER ── */
+    async function submitOrder() {
       const name     = document.getElementById('oName').value.trim();
       const phone    = document.getElementById('oPhone').value.trim();
       const altPhone = document.getElementById('oAltPhone').value.trim();
@@ -1944,9 +1962,206 @@
       const delivery  = (km === null || km <= FREE_DELIVERY_RADIUS_KM || isFirstTwoOrders()) ? 0 : km * RATE_PER_KM;
       const total     = sub + gst + delivery;
       const address   = `${door}, ${area}, ${village}${pincode ? ' - ' + pincode : ''}`;
+      const orderNo   = 'GS-' + Date.now().toString().slice(-8);
+      const orderDate = new Date().toLocaleDateString('en-IN', { day:'2-digit', month:'long', year:'numeric' });
 
+      /* ── BUILD PDF INVOICE ── */
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+      const W = 210, H = 297;
+      const gold   = [212, 175, 55];
+      const royal  = [75,  14,  78];
+      const dark   = [26,   5,  32];
+      const cream  = [253, 246, 227];
+      const white  = [255, 255, 255];
+      const lgray  = [220, 210, 230];
+
+      /* Background */
+      doc.setFillColor(...dark);
+      doc.rect(0, 0, W, H, 'F');
+
+      /* Top gold bar */
+      doc.setFillColor(...gold);
+      doc.rect(0, 0, W, 14, 'F');
+
+      /* Header band */
+      doc.setFillColor(...royal);
+      doc.rect(0, 14, W, 46, 'F');
+
+      /* Gold bottom border on header */
+      doc.setDrawColor(...gold);
+      doc.setLineWidth(0.5);
+      doc.line(0, 60, W, 60);
+
+      /* Try to load logo from GitHub */
+      try {
+        const logoUrl = 'https://raw.githubusercontent.com/gaayathrisarees/gaayathrisarees/main/images/onlylogo.png';
+        const logoData = await fetchImageAsBase64(logoUrl);
+        if (logoData) doc.addImage(logoData, 'PNG', 10, 16, 38, 38);
+      } catch(e) {}
+
+      /* Brand name */
+      doc.setTextColor(...gold);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(22);
+      doc.text('GAAYATHRI SAREES', 56, 33);
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(...cream);
+      doc.text('Mac Society, BHEL Township, Hyderabad – 502032', 56, 40);
+      doc.text('+91 9666041369  |  gaayathrisarees@gmail.com', 56, 46);
+      doc.text('www.gaayathrisarees.com', 56, 52);
+
+      /* INVOICE label top-right */
+      doc.setFillColor(...gold);
+      doc.roundedRect(148, 17, 52, 12, 2, 2, 'F');
+      doc.setTextColor(...royal);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
+      doc.text('INVOICE', 174, 26, { align: 'center' });
+
+      /* Order meta */
+      doc.setTextColor(...gold);
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'bold');
+      doc.text('ORDER NO:', 148, 37);
+      doc.text('DATE:', 148, 43);
+      doc.setTextColor(...cream);
+      doc.setFont('helvetica', 'normal');
+      doc.text(orderNo, 172, 37);
+      doc.text(orderDate, 172, 43);
+
+      /* ── PRODUCT SECTION ── */
+      let y = 68;
+
+      /* Section label */
+      doc.setFillColor(40, 8, 50);
+      doc.rect(10, y, W - 20, 8, 'F');
+      doc.setTextColor(...gold);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.text('ORDER DETAILS', 14, y + 5.5);
+      y += 12;
+
+      /* Try product image */
+      try {
+        const imgData = await fetchImageAsBase64(currentItem.img);
+        if (imgData) {
+          doc.setDrawColor(...gold);
+          doc.setLineWidth(0.4);
+          doc.rect(10, y, 38, 48);
+          doc.addImage(imgData, 'PNG', 10, y, 38, 48);
+        }
+      } catch(e) {}
+
+      /* Product info beside image */
+      const px = 54;
+      doc.setTextColor(...gold);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(13);
+      doc.text(currentItem.name, px, y + 8);
+
+      doc.setTextColor(...cream);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8.5);
+      doc.text('Category: ' + (currentItem.desc || 'Saree'), px, y + 16);
+
+      /* Price table */
+      const rows = [
+        ['Item Price', qty > 1 ? `₹${unitPrice.toLocaleString('en-IN')} × ${qty}` : '', `₹${sub.toLocaleString('en-IN')}`],
+        ['GST (5%)', '', `₹${gst.toLocaleString('en-IN')}`],
+        ['Delivery', km && km <= FREE_DELIVERY_RADIUS_KM ? 'Within 30 km' : (delivery === 0 ? 'Free (First Order)' : `${km} km`), delivery === 0 ? 'FREE' : `₹${delivery.toLocaleString('en-IN')}`],
+      ];
+      let ry = y + 24;
+      doc.setFontSize(8);
+      rows.forEach(([label, note, val]) => {
+        doc.setTextColor(180, 160, 200);
+        doc.text(label, px, ry);
+        doc.setTextColor(150, 140, 160);
+        if (note) doc.text(note, px + 40, ry);
+        doc.setTextColor(...cream);
+        doc.text(val, 192, ry, { align: 'right' });
+        doc.setDrawColor(60, 20, 70);
+        doc.setLineWidth(0.2);
+        doc.line(px, ry + 2, 192, ry + 2);
+        ry += 9;
+      });
+
+      /* Total row */
+      doc.setFillColor(60, 20, 70);
+      doc.rect(px - 2, ry - 1, 192 - px + 4, 10, 'F');
+      doc.setTextColor(...gold);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.text('TOTAL AMOUNT', px, ry + 6.5);
+      doc.text(`₹${total.toLocaleString('en-IN')}`, 192, ry + 6.5, { align: 'right' });
+
+      y = Math.max(y + 60, ry + 18);
+
+      /* ── CUSTOMER DETAILS ── */
+      doc.setFillColor(40, 8, 50);
+      doc.rect(10, y, W - 20, 8, 'F');
+      doc.setTextColor(...gold);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.text('CUSTOMER DETAILS', 14, y + 5.5);
+      y += 12;
+
+      const custFields = [
+        ['Name',            name],
+        ['Phone',           phone],
+        ...(altPhone ? [['Alt. Phone', altPhone]] : []),
+        ['Delivery Address', address],
+      ];
+      doc.setFontSize(9);
+      custFields.forEach(([label, val]) => {
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(...gold);
+        doc.text(label + ':', 14, y);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(...cream);
+        const lines = doc.splitTextToSize(val, 130);
+        doc.text(lines, 60, y);
+        y += lines.length * 6 + 2;
+      });
+
+      /* ── THANK YOU BAND ── */
+      y += 6;
+      doc.setFillColor(...royal);
+      doc.rect(0, y, W, 20, 'F');
+      doc.setDrawColor(...gold);
+      doc.setLineWidth(0.4);
+      doc.line(0, y, W, y);
+      doc.line(0, y + 20, W, y + 20);
+      doc.setTextColor(...gold);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.text('Thank you for shopping with Gaayathri Sarees! 🌸', W / 2, y + 9, { align: 'center' });
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7.5);
+      doc.setTextColor(...cream);
+      doc.text('For queries: +91 9666041369  |  gaayathrisarees@gmail.com', W / 2, y + 15, { align: 'center' });
+
+      /* Bottom gold bar */
+      doc.setFillColor(...gold);
+      doc.rect(0, H - 8, W, 8, 'F');
+      doc.setTextColor(...royal);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(7);
+      doc.text('GAAYATHRI SAREES  ·  Mac Society, BHEL Township, Hyderabad 502032  ·  9666041369', W / 2, H - 3, { align: 'center' });
+
+      /* ── DOWNLOAD PDF ── */
+      const pdfBlob = doc.output('blob');
+      const pdfUrl  = URL.createObjectURL(pdfBlob);
+      const dlLink  = document.createElement('a');
+      dlLink.href     = pdfUrl;
+      dlLink.download = `Invoice_${orderNo}.pdf`;
+      dlLink.click();
+
+      /* ── WHATSAPP ── */
       const waText =
         `🌸 *New Order — Gaayathri Sarees* 🌸\n\n` +
+        `*Order No:* ${orderNo}\n` +
         `*Item:* ${currentItem.name}\n` +
         `*Qty:* ${qty}\n` +
         `*Item Price:* ₹${sub.toLocaleString('en-IN')}\n` +
@@ -1956,26 +2171,71 @@
         `👤 *Customer Details*\n` +
         `Name: ${name}\nPhone: ${phone}\n` +
         (altPhone ? `Alt. Phone: ${altPhone}\n` : '') +
-        `Address: ${address}`;
-
-      const subject = encodeURIComponent(`New Order: ${currentItem.name} — ${name}`);
-      const body    = encodeURIComponent(
-        `New Order from Gaayathri Sarees Website\n\n` +
-        `Item: ${currentItem.name}\nQty: ${qty}\nItem Price: ₹${sub}\nGST (5%): ₹${gst}\n` +
-        `Delivery: ₹${delivery}\nTotal: ₹${total}\n\n` +
-        `Customer: ${name}\nPhone: ${phone}\n` +
-        (altPhone ? `Alt. Phone: ${altPhone}\n` : '') +
-        `Address: ${address}`
-      );
+        `Address: ${address}\n\n` +
+        `📎 Invoice PDF: ${orderNo} (downloaded to customer's device)`;
 
       incrementOrderCount();
       window.open('https://wa.me/919666041369?text=' + encodeURIComponent(waText), '_blank');
-      setTimeout(() => {
-        window.open(`mailto:gaayathrisarees@gmail.com?subject=${subject}&body=${body}`, '_blank');
-      }, 800);
+
+      /* ── EMAIL via EmailJS — no mail client needed ── */
+      setTimeout(async () => {
+        try {
+          await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+            to_email    : 'gaayathrisarees@gmail.com',
+            order_no    : orderNo,
+            order_date  : orderDate,
+            item_name   : currentItem.name,
+            item_qty    : qty,
+            item_price  : '₹' + sub.toLocaleString('en-IN'),
+            gst         : '₹' + gst.toLocaleString('en-IN'),
+            delivery    : delivery === 0 ? 'FREE' : '₹' + delivery.toLocaleString('en-IN'),
+            total       : '₹' + total.toLocaleString('en-IN'),
+            cust_name   : name,
+            cust_phone  : phone,
+            cust_alt    : altPhone || '—',
+            cust_address: address,
+            invoice_id  : orderNo,
+          });
+          console.log('✅ Email sent via EmailJS');
+        } catch(err) {
+          console.warn('EmailJS send failed:', err);
+          /* Fallback — open mailto if EmailJS not configured yet */
+          if (EMAILJS_SERVICE_ID === 'YOUR_SERVICE_ID') {
+            const subject = encodeURIComponent(`New Order ${orderNo}: ${currentItem.name} — ${name}`);
+            const body = encodeURIComponent(
+              `GAAYATHRI SAREES — NEW ORDER\n\n` +
+              `Order No : ${orderNo}\nDate : ${orderDate}\n\n` +
+              `Item : ${currentItem.name}\nQty : ${qty}\n` +
+              `Price : ₹${sub.toLocaleString('en-IN')}\nGST : ₹${gst.toLocaleString('en-IN')}\n` +
+              `Delivery : ${delivery === 0 ? 'FREE' : '₹' + delivery.toLocaleString('en-IN')}\n` +
+              `TOTAL : ₹${total.toLocaleString('en-IN')}\n\n` +
+              `Customer : ${name} | ${phone}\n` +
+              (altPhone ? `Alt : ${altPhone}\n` : '') +
+              `Address : ${address}`
+            );
+            window.open(`mailto:gaayathrisarees@gmail.com?subject=${subject}&body=${body}`, '_blank');
+          }
+        }
+      }, 1200);
 
       closeOrderModal();
-      alert('✅ Order submitted! WhatsApp & Email have been opened. We will confirm your order shortly.');
+      setTimeout(() => {
+        alert(`✅ Order Placed!\n\n📄 Invoice PDF "${orderNo}" downloaded to your device.\n📱 WhatsApp message sent.\n📧 Email client opened.\n\nThank you for shopping with Gaayathri Sarees! 🌸`);
+      }, 500);
+    }
+
+    /* ── HELPER: fetch image as base64 ── */
+    async function fetchImageAsBase64(url) {
+      try {
+        const res = await fetch(url);
+        if (!res.ok) return null;
+        const blob = await res.blob();
+        return await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.readAsDataURL(blob);
+        });
+      } catch(e) { return null; }
     }
 
     /* ── WHATSAPP ENQUIRY (contact form) ── */
