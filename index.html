@@ -891,12 +891,15 @@
       <span></span><span></span><span></span>
     </div>
     <ul class="nav-links" id="navLinks">
-      <li><a href="#collections">Collections</a></li>
+      <li><a href="#collections">Most Ordered</a></li>
       <li><a href="#categories">Categories</a></li>
       <li><a href="#why">Why Us</a></li>
       <li><a href="#testimonials">Reviews</a></li>
       <li><a href="#contact">Contact</a></li>
-      <li><a href="tel:9666041369" class="nav-cta">📞 Order Now</a></li>
+      <li><a href="#" class="nav-cta" onclick="event.preventDefault();openSavedPanel();" style="position:relative;">
+        ♥ Saved Items
+        <span id="navSavedBadge" style="display:none;position:absolute;top:-6px;right:-8px;background:#ff6b9d;color:#fff;font-size:.55rem;font-weight:700;min-width:17px;height:17px;border-radius:9px;align-items:center;justify-content:center;font-family:sans-serif;padding:0 3px;"></span>
+      </a></li>
     </ul>
   </nav>
 
@@ -932,8 +935,8 @@
        COLLECTIONS
   ══════════════════════════════════ -->
   <section id="collections">
-    <p class="section-eyebrow reveal">Curated For You</p>
-    <h2 class="section-title reveal">Our <span>Collections</span></h2>
+    <p class="section-eyebrow reveal">Customer Favourites</p>
+    <h2 class="section-title reveal">Most <span>Ordered Items</span></h2>
     <div class="divider"></div>
     <div class="collections-grid">
 
@@ -1318,15 +1321,15 @@
 
       <!-- Selected Item Summary — large image -->
       <div style="background:rgba(75,14,78,.25);border:1px solid rgba(212,175,55,.25);margin-bottom:24px;overflow:hidden;">
-        <!-- Big image banner -->
-        <div style="width:100%;height:200px;overflow:hidden;position:relative;background:rgba(75,14,78,.4);">
-          <img id="orderItemImg" src="" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none'"/>
-          <!-- gradient overlay on image -->
-          <div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(26,3,32,.85));pointer-events:none;"></div>
+        <!-- Big image banner — contain so full saree shows -->
+        <div style="width:100%;height:260px;overflow:hidden;position:relative;background:linear-gradient(160deg,#2a0535,#1a0320);">
+          <img id="orderItemImg" src="" alt="" style="width:100%;height:100%;object-fit:contain;display:block;padding:8px;" onerror="this.style.display='none'"/>
+          <!-- subtle bottom gradient for text readability -->
+          <div style="position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(to bottom,transparent,rgba(26,3,32,.92));pointer-events:none;"></div>
           <!-- name on image -->
           <div style="position:absolute;bottom:14px;left:16px;right:16px;">
             <p style="font-family:var(--font);font-size:.6rem;letter-spacing:.28em;color:var(--gold);text-transform:uppercase;margin-bottom:4px;">Selected Item</p>
-            <p id="orderItemName" style="font-family:var(--font);color:#fff;font-size:1rem;font-weight:700;letter-spacing:.08em;text-shadow:0 2px 8px rgba(0,0,0,.6);"></p>
+            <p id="orderItemName" style="font-family:var(--font);color:#fff;font-size:1rem;font-weight:700;letter-spacing:.08em;text-shadow:0 2px 8px rgba(0,0,0,.8);"></p>
           </div>
         </div>
         <!-- price + qty row below image -->
@@ -1597,9 +1600,11 @@
     }
 
     function updateSavedBadge() {
-      const badge = document.getElementById('savedBadge');
-      if (badge) badge.textContent = savedItems.length || '';
-      badge && (badge.style.display = savedItems.length ? 'flex' : 'none');
+      const badge    = document.getElementById('savedBadge');
+      const navBadge = document.getElementById('navSavedBadge');
+      const count    = savedItems.length;
+      if (badge) { badge.textContent = count || ''; badge.style.display = count ? 'flex' : 'none'; }
+      if (navBadge) { navBadge.textContent = count || ''; navBadge.style.display = count ? 'flex' : 'none'; }
     }
 
     function openSavedPanel() {
