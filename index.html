@@ -1703,17 +1703,12 @@
         pre.classList.add('fade-out');
         setTimeout(revealOnScroll, 800);
       }
-      // If video plays, show for max 4 seconds then dismiss
-      video.addEventListener('playing', function handler() {
-        video.removeEventListener('playing', handler);
-        setTimeout(dismiss, 4000);
-      }, { once: true });
-      // Dismiss immediately when video ends
-      video.addEventListener('ended', dismiss, { once: true });
-      // Dismiss immediately on any error
-      video.addEventListener('error', dismiss);
-      // Fallback: if nothing happens in 2.5 seconds, dismiss anyway
-      setTimeout(dismiss, 2500);
+      // Always show exactly 6 seconds regardless of video
+      video.addEventListener('error', function() {
+        // video failed — hide video, still show preloader for 6s
+        video.style.display = 'none';
+      });
+      setTimeout(dismiss, 6000);
     })();
 
     /* ── MOBILE NAV TOGGLE ── */
