@@ -27,6 +27,9 @@
   <!-- Google Fonts fallback for Cinzel -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&display=swap" rel="stylesheet"/>
+  <!-- Auto-load settings from GitHub (upload gs-settings.js to repo root) -->
+  <script src="gs-settings.js"></script>
+
   <!-- jsPDF for invoice generation -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script>
@@ -2115,12 +2118,15 @@
       /* Show free delivery promo banner */
       const bannerText = document.getElementById('freeDeliveryBannerText');
       const orderNo = getOrderCount();
-      if (orderNo < 2) {
-        const rem = 2 - orderNo;
-        bannerText.textContent = `🎉 FREE delivery on your first 2 orders! You have ${rem} free order${rem>1?'s':''} remaining.`;
+      const _freeKmBanner = getAdminSetting('gsFreeKm', 30);
+      const _rateKmBanner = getAdminSetting('gsRateKm', 2);
+      const _freeOrdBanner = getAdminSetting('gsFreeOrders', 2);
+      if (orderNo < _freeOrdBanner) {
+        const rem = _freeOrdBanner - orderNo;
+        bannerText.textContent = `🎉 FREE delivery on your first ${_freeOrdBanner} orders! You have ${rem} free order${rem>1?'s':''} remaining.`;
         document.getElementById('freeDeliveryBanner').style.display = 'flex';
       } else {
-        bannerText.textContent = `FREE delivery within 30 km of BHEL Township · ₹2/km beyond`;
+        bannerText.textContent = `FREE delivery within ${_freeKmBanner} km of BHEL Township · ₹${_rateKmBanner}/km beyond`;
         document.getElementById('freeDeliveryBanner').style.display = 'flex';
       }
       document.getElementById('orderModal').style.display = 'block';
@@ -2947,6 +2953,7 @@
       document.getElementById('adminGstNo').value = getAdminStrSetting('gsGstNo', '');
       document.getElementById('adminBizName').value = getAdminStrSetting('gsBizName', 'Gaayathri Sarees');
       document.getElementById('adminCodNote').value = getAdminStrSetting('gsCodNote', 'Pay cash at doorstep on delivery.');
+      updateGstPreview();
     }
 
     function saveGstSettings() {
@@ -2956,9 +2963,49 @@
       localStorage.setItem('gsCodNote', document.getElementById('adminCodNote').value.trim());
       const msg = document.getElementById('gstSaveMsg');
       msg.style.display = 'block';
+      updateGstPreview();
       setTimeout(() => msg.style.display = 'none', 3000);
     }
 
+    function updateGstPreview() {
+      const rate  = getAdminSetting('gsGstRate', 5);
+      const gstNo = getAdminStrSetting('gsGstNo', '');
+      const biz   = getAdminStrSetting('gsBizName', 'Gaayathri Sarees');
+      const prev  = document.getElementById('gstPreview');
+      if (!prev) return;
+      prev.innerHTML =
+        '🏷️ Business Name: <strong style="color:var(--gold);">' + biz + '</strong><br/>' +
+        '🧾 GST Rate: <strong style="color:var(--gold);">' + rate + '%</strong> (invoice lo item price meeda apply avutundi)<br/>' +
+        '🔢 GSTIN: <strong style="color:var(--gold);">' + (gstNo || '<span style="color:rgba(253,246,227,.4);">Enter cheyyaledu — website URL show avutundi</span>') + '</strong>';
+    }
+
+    function exportSettingsFile() {
+      var settings = {
+        gsFreeKm:     getAdminSetting('gsFreeKm', 30),
+        gsRateKm:     getAdminSetting('gsRateKm', 2),
+        gsFreeOrders: getAdminSetting('gsFreeOrders', 2),
+        gsGstRate:    getAdminSetting('gsGstRate', 5),
+        gsGstNo:      getAdminStrSetting('gsGstNo', ''),
+        gsBizName:    getAdminStrSetting('gsBizName', 'Gaayathri Sarees'),
+        gsCodNote:    getAdminStrSetting('gsCodNote', 'Pay cash at doorstep on delivery.'),
+      };
+      var lines = [
+        '/* Gaayathri Sarees Settings — ' + new Date().toLocaleString('en-IN') + ' */',
+        '(function(){',
+        '  var s=' + JSON.stringify(settings) + ';',
+        '  Object.keys(s).forEach(function(k){localStorage.setItem(k,s[k]);});',
+        '  window.FREE_DELIVERY_RADIUS_KM=s.gsFreeKm;',
+        '  window.RATE_PER_KM=s.gsRateKm;',
+        '})();'
+      ];
+      var js = lines.join('\n');
+      var blob = new Blob([js], {type:'text/javascript'});
+      var url  = URL.createObjectURL(blob);
+      var a    = document.createElement('a');
+      a.href = url; a.download = 'gs-settings.js'; a.click();
+      URL.revokeObjectURL(url);
+      alert('gs-settings.js downloaded!\n\nInstructions:\n1. GitHub.com lo gaayathrisarees repo open cheyyi\n2. Add file -> Upload files click cheyyi\n3. gs-settings.js select cheyyi -> Commit changes\n4. Done! All customers ki apply avutayi');
+    }
     function loadAdminSettings() {
       // Load delivery settings into live variables
       const freeKm = getAdminSetting('gsFreeKm', 30);
@@ -3107,6 +3154,20 @@
         </div>
         <button class="admin-save-btn" onclick="saveGstSettings()" style="margin-top:14px;">💾 Save GST Settings</button>
         <p id="gstSaveMsg" style="font-family:var(--font);font-size:.68rem;color:#6ddc82;margin-top:8px;display:none;">✅ GST settings saved!</p>
+
+        <!-- Current GST Preview -->
+        <div style="margin-top:20px;border-top:1px solid rgba(212,175,55,.2);padding-top:16px;">
+          <p style="font-family:var(--font);font-size:.65rem;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;margin-bottom:10px;">Current GST on Invoice</p>
+          <div id="gstPreview" style="font-family:var(--font);font-size:.78rem;color:rgba(253,246,227,.7);line-height:2;"></div>
+        </div>
+
+        <!-- Export Settings for GitHub -->
+        <div style="margin-top:24px;border-top:1px solid rgba(212,175,55,.2);padding-top:18px;">
+          <p style="font-family:var(--font);font-size:.65rem;letter-spacing:.18em;color:var(--gold);text-transform:uppercase;margin-bottom:6px;">📤 All Customers ki Apply Cheyyadaniki</p>
+          <p style="font-family:var(--font);font-size:.68rem;color:rgba(253,246,227,.45);margin-bottom:12px;letter-spacing:.04em;">Settings file download chesi GitHub repo lo upload cheyyi → automatically all customers ki apply avutundi.</p>
+          <button class="admin-save-btn" onclick="exportSettingsFile()" style="background:rgba(212,175,55,.15);border:1px solid var(--gold);color:var(--gold);">📥 Download gs-settings.js (GitHub ki Upload Cheyyi)</button>
+          <p style="font-family:var(--font);font-size:.62rem;color:rgba(253,246,227,.35);margin-top:8px;letter-spacing:.04em;">Download tarvata: GitHub repo → gs-settings.js upload cheyyi → Done! ✅</p>
+        </div>
       </div>
     </div>
   </div>
