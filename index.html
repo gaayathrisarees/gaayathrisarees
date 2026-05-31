@@ -1082,7 +1082,51 @@
     <div class="hamburger" id="hamburger" onclick="toggleNav()">
       <span></span><span></span><span></span>
     </div>
-    <button onclick="openAdminLogin()" style="background:transparent;border:1px solid rgba(212,175,55,.35);color:rgba(212,175,55,.7);font-family:var(--font);font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;padding:6px 13px;cursor:pointer;border-radius:2px;transition:all .25s;" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='rgba(212,175,55,.35)';this.style.color='rgba(212,175,55,.7)'">⚙ Admin</button>
+    <button onclick="openAdminLogin()" id="adminNavBtn" style="
+      background: linear-gradient(135deg, rgba(75,14,78,0.4), rgba(26,5,32,0.6));
+      border: 1.5px solid rgba(212,175,55,.45);
+      color: rgba(212,175,55,.75);
+      font-family: var(--font);
+      font-size: .52rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      padding: 7px 18px 7px 14px;
+      cursor: pointer;
+      border-radius: 50px;
+      transition: all .3s cubic-bezier(.4,0,.2,1);
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      box-shadow: 0 0 0 0 rgba(212,175,55,0);
+      position: relative;
+      overflow: hidden;
+    "
+    onmouseover="
+      this.style.background='linear-gradient(135deg,rgba(212,175,55,.18),rgba(75,14,78,.6))';
+      this.style.borderColor='var(--gold)';
+      this.style.color='var(--gold)';
+      this.style.boxShadow='0 0 16px 2px rgba(212,175,55,.25), inset 0 0 12px rgba(212,175,55,.08)';
+      this.style.transform='translateY(-1px) scale(1.04)';
+      this.querySelector('.admin-dot').style.background='var(--gold)';
+      this.querySelector('.admin-dot').style.boxShadow='0 0 6px 2px rgba(212,175,55,.6)';
+    "
+    onmouseout="
+      this.style.background='linear-gradient(135deg,rgba(75,14,78,0.4),rgba(26,5,32,0.6))';
+      this.style.borderColor='rgba(212,175,55,.45)';
+      this.style.color='rgba(212,175,55,.75)';
+      this.style.boxShadow='0 0 0 0 rgba(212,175,55,0)';
+      this.style.transform='translateY(0) scale(1)';
+      this.querySelector('.admin-dot').style.background='rgba(212,175,55,.5)';
+      this.querySelector('.admin-dot').style.boxShadow='none';
+    ">
+      <span class="admin-dot" style="
+        width: 7px; height: 7px; border-radius: 50%;
+        background: rgba(212,175,55,.5);
+        display: inline-block; flex-shrink: 0;
+        transition: all .3s ease;
+      "></span>
+      ⚙ Admin
+    </button>
     <ul class="nav-links" id="navLinks">
       <li><a href="#collections">Most Ordered</a></li>
       <li><a href="#categories">Categories</a></li>
@@ -1652,17 +1696,24 @@
     (function () {
       const pre   = document.getElementById('preloader');
       const video = document.getElementById('introVideo');
+      let dismissed = false;
       function dismiss() {
+        if (dismissed) return;
+        dismissed = true;
         pre.classList.add('fade-out');
         setTimeout(revealOnScroll, 800);
       }
+      // If video plays, show for max 4 seconds then dismiss
       video.addEventListener('playing', function handler() {
         video.removeEventListener('playing', handler);
-        setTimeout(dismiss, 6000);
+        setTimeout(dismiss, 4000);
       }, { once: true });
+      // Dismiss immediately when video ends
       video.addEventListener('ended', dismiss, { once: true });
-      video.addEventListener('error', () => setTimeout(dismiss, 500));
-      setTimeout(dismiss, 7000);
+      // Dismiss immediately on any error
+      video.addEventListener('error', dismiss);
+      // Fallback: if nothing happens in 2.5 seconds, dismiss anyway
+      setTimeout(dismiss, 2500);
     })();
 
     /* ── MOBILE NAV TOGGLE ── */
@@ -2662,12 +2713,6 @@
         alert(`✅ Order Placed! — ${orderNo}\n\n📄 Invoice PDF downloaded\n📱 WhatsApp message sent\n${emailNote}\n${payMsg}\n\nThank you for shopping with Gaayathri Sarees! 🌸`);
       }, 500);
     }
-      setTimeout(() => {
-        const emailNote = custEmail ? `📧 Invoice email sent to ${custEmail}` : `📧 Email sent to Gaayathri Sarees`;
-        alert(`✅ Order Placed! — ${orderNo}\n\n📄 Invoice PDF downloaded to your device\n📱 WhatsApp message sent\n${emailNote}\n\nThank you for shopping with Gaayathri Sarees! 🌸`);
-      }, 500);
-    }
-
     /* ── HELPER: fetch image as base64 ── */
     async function fetchImageAsBase64(url) {
       try {
