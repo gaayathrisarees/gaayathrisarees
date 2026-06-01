@@ -1057,6 +1057,29 @@
     }
     #upiPaidBadge.show { display:inline-block; }
 
+    /* UTR validation hint */
+    .utr-hint {
+      font-family:var(--font); font-size:.62rem; letter-spacing:.08em;
+      margin-bottom:6px; padding:4px 8px; border-radius:2px;
+      display:none;
+    }
+    .utr-hint.valid   { display:block; color:#6ddc82; background:rgba(39,174,96,.12); border:1px solid rgba(39,174,96,.3); }
+    .utr-hint.invalid { display:block; color:#e74c3c; background:rgba(231,76,60,.10); border:1px solid rgba(231,76,60,.3); }
+
+    /* Pending verification banner shown after order placed */
+    #payPendingBanner {
+      display:none; background:linear-gradient(135deg,rgba(230,126,34,.18),rgba(230,126,34,.08));
+      border:1px solid rgba(230,126,34,.5); border-radius:4px;
+      padding:18px 20px; text-align:center; margin-top:16px;
+    }
+    #payPendingBanner.show { display:block; }
+    #payPendingBanner .pend-icon { font-size:2rem; margin-bottom:8px; }
+    #payPendingBanner p {
+      font-family:var(--font); font-size:.72rem; color:#f39c12;
+      letter-spacing:.08em; line-height:1.8;
+    }
+    #payPendingBanner strong { color:#fff; }
+
     /* UPI APP SELECTION */
     .upi-apps-label {
       font-family:var(--font); font-size:.65rem; color:rgba(253,246,227,.5);
@@ -1736,10 +1759,20 @@
           </div>
 
           <div class="upi-paid-confirm">
-            <p>📸 Payment chesina tarvata, Transaction ID enter cheyyandi:</p>
-            <input id="upiTxnInput" type="text" placeholder="Enter Transaction ID / UTR number"/>
+            <p>📸 Payment chesina tarvata, UTR / Transaction ID enter cheyyandi:</p>
+            <input id="upiTxnInput" type="text" placeholder="12-digit UTR number (e.g. 506241234567)" oninput="validateUtr(this.value)"/>
+            <div id="utrHint" class="utr-hint"></div>
             <button id="upiConfirmBtn" onclick="confirmUpiPayment()">✅ Confirm Payment</button>
-            <div id="upiPaidBadge">✅ PAYMENT CONFIRMED — ₹50 Discount Applied!</div>
+            <div id="upiPaidBadge">✅ UTR Submitted — Verification Pending (₹50 Discount Reserved!)</div>
+          </div>
+
+          <!-- Pending verification info box (shown after order submit) -->
+          <div id="payPendingBanner">
+            <div class="pend-icon">⏳</div>
+            <p><strong>Payment Verification Pending</strong><br/>
+            మీ UTR number మాకు WhatsApp లో వెళ్ళింది.<br/>
+            మేము GPay లో verify చేసి <strong>2–4 గంటల్లో</strong> confirm చేస్తాము.<br/>
+            Confirm అయిన తర్వాతే order dispatch అవుతుంది.</p>
           </div>
         </div>
       </div>
@@ -2320,14 +2353,36 @@
       if (el) el.textContent = `Amount to pay: ₹${total.toLocaleString('en-IN')} (Cash at doorstep)`;
     }
 
+    /* ── UTR FORMAT VALIDATION ── */
+    function validateUtr(val) {
+      const hint = document.getElementById('utrHint');
+      if (!val) { hint.className = 'utr-hint'; hint.textContent = ''; return false; }
+      // UTR: 12-digit number, or alphanumeric 12–22 chars (some banks differ)
+      const isValid = /^[0-9]{12}$/.test(val) || /^[A-Za-z0-9]{12,22}$/.test(val);
+      if (isValid) {
+        hint.className = 'utr-hint valid';
+        hint.textContent = '✓ Valid UTR format';
+      } else {
+        hint.className = 'utr-hint invalid';
+        hint.textContent = '✗ UTR usually 12 digits — double check cheyyandi';
+      }
+      return isValid;
+    }
+
     function confirmUpiPayment() {
       const txn = document.getElementById('upiTxnInput').value.trim();
-      if (!txn) { alert('Please enter your UPI Transaction ID / UTR number.'); return; }
+      if (!txn) { alert('Please enter your UTR / Transaction ID.'); return; }
+      const isValid = validateUtr(txn);
+      if (!isValid) {
+        const go = confirm('UTR format correct గా లేదు — still submit చేయాలా?\n(Correct UTR: 12 digits)');
+        if (!go) return;
+      }
       upiPaymentConfirmed = true;
       upiTxnId = txn;
       document.getElementById('upiPaidBadge').classList.add('show');
       document.getElementById('upiConfirmBtn').disabled = true;
-      document.getElementById('upiConfirmBtn').textContent = '✅ Confirmed';
+      document.getElementById('upiConfirmBtn').textContent = '⏳ Submitted — Pending Verification';
+      document.getElementById('upiConfirmBtn').style.background = '#e67e22';
     }
 
     /* ── UPI APP DEEP LINK ── */
@@ -2715,8 +2770,8 @@
       const payInfo = payMethod === 'COD'
         ? `💵 *Payment:* CASH ON DELIVERY\nAmount to collect: ₹${total.toLocaleString('en-IN')}`
         : upiConfirmed
-          ? `✅ *Payment:* PAID via UPI\nTxn Ref: ${txnRef}\nAmount Paid: ₹${total.toLocaleString('en-IN')} (₹50 UPI discount applied)`
-          : `📲 *Payment:* UPI — Pending confirmation\nAmount: ₹${total.toLocaleString('en-IN')}`;
+          ? `⏳ *Payment:* UPI — VERIFICATION PENDING\n🔢 *UTR Number:* ${txnRef}\n💰 Amount: ₹${total.toLocaleString('en-IN')}\n👉 GPay లో verify చేసి confirm cheyyandi`
+          : `📲 *Payment:* UPI — UTR not submitted yet\nAmount: ₹${total.toLocaleString('en-IN')}`;
 
       const waText =
         `🌸 *New Order — Gaayathri Sarees* 🌸\n\n` +
@@ -2829,7 +2884,7 @@
             return res.json();
           };
 
-          const payTag = payMethod === 'COD' ? '[COD]' : (upiConfirmed ? '[UPI-PAID]' : '[UPI-PENDING]');
+          const payTag = payMethod === 'COD' ? '[COD]' : (upiConfirmed ? '[UPI-VERIFY] UTR:' + txnRef : '[UPI-PENDING]');
           await sendEmail(
             'gaayathrisarees@gmail.com',
             `🛍️ ${payTag} New Order ${orderNo}: ${currentItem.name} — ${name}`,
@@ -2839,7 +2894,7 @@
           if (custEmail) {
             await sendEmail(
               custEmail,
-              `✅ Order Confirmed — ${orderNo} | Gaayathri Sarees`,
+              `✅ Order Placed — ${orderNo} | Gaayathri Sarees`,
               buildInvoiceHTML(true)
             );
           }
@@ -2855,10 +2910,12 @@
       upiTxnId = '';
       setTimeout(() => {
         const payMsg = payMethod === 'COD'
-          ? '💵 Payment: Cash on Delivery'
-          : (upiConfirmed ? '✅ UPI Payment Confirmed (₹50 discount applied!)' : '📲 UPI Payment — Please complete payment');
+          ? '💵 Payment: Cash on Delivery — pay at doorstep'
+          : (upiConfirmed
+            ? `⏳ UPI UTR submitted (${txnRef}) — మేము GPay లో verify చేసి 2-4 గంటల్లో confirm చేస్తాము. Confirm తర్వాతే dispatch!`
+            : '📲 UPI Payment — UTR submit చేయలేదు, payment verify కాదు');
         const emailNote = custEmail ? `📧 Invoice email sent to ${custEmail}` : `📧 Email sent to Gaayathri Sarees`;
-        alert(`✅ Order Placed! — ${orderNo}\n\n📄 Invoice PDF downloaded\n📱 WhatsApp message sent\n${emailNote}\n${payMsg}\n\nThank you for shopping with Gaayathri Sarees! 🌸`);
+        alert(`✅ Order Placed! — ${orderNo}\n\n📄 Invoice PDF downloaded\n📱 WhatsApp కి UTR పంపించాం\n${emailNote}\n\n${payMsg}\n\nThank you for shopping with Gaayathri Sarees! 🌸`);
       }, 500);
     }
     /* ── HELPER: fetch image as base64 ── */
@@ -2993,7 +3050,11 @@
           <td>${o.item}</td>
           <td style="text-align:center;">${o.qty}</td>
           <td style="color:var(--gold);font-weight:700;white-space:nowrap;">₹${(o.total||0).toLocaleString('en-IN')}</td>
-          <td>${o.payMethod === 'COD' ? '<span class="badge-cod">COD</span>' : (o.upiConfirmed ? '<span class="badge-paid">PAID</span>' : '<span class="badge-upi">UPI</span>')}</td>
+          <td>${o.payMethod === 'COD'
+            ? '<span class="badge-cod">COD</span>'
+            : (o.upiConfirmed
+              ? `<span class="badge-upi" style="background:#e67e22;">⏳ VERIFY<br/><span style="font-size:.58rem;letter-spacing:.04em;">UTR: ${o.txnRef || '—'}</span></span>`
+              : '<span class="badge-upi">UPI</span>')}</td>
           <td><span style="color:#6ddc82;font-size:.65rem;">Order Placed</span></td>
         </tr>
       `).join('') || '<tr><td colspan="10" style="text-align:center;color:rgba(253,246,227,.4);padding:24px;">No orders found</td></tr>';
