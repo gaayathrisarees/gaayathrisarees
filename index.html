@@ -1056,6 +1056,42 @@
       border-radius:2px; text-align:center;
     }
     #upiPaidBadge.show { display:inline-block; }
+
+    /* UPI APP SELECTION */
+    .upi-apps-label {
+      font-family:var(--font); font-size:.65rem; color:rgba(253,246,227,.5);
+      letter-spacing:.18em; text-transform:uppercase; margin-bottom:10px;
+      text-align:center;
+    }
+    .upi-apps-row {
+      display:flex; gap:10px; justify-content:center;
+      flex-wrap:wrap; margin-bottom:16px;
+    }
+    .upi-app-btn {
+      display:flex; flex-direction:column; align-items:center; gap:6px;
+      background:rgba(255,255,255,.06); border:2px solid rgba(212,175,55,.25);
+      border-radius:12px; padding:10px 14px; cursor:pointer;
+      transition:all .22s; text-decoration:none; min-width:72px;
+    }
+    .upi-app-btn:hover, .upi-app-btn.active {
+      border-color:var(--gold); background:rgba(212,175,55,.12);
+      transform:translateY(-2px); box-shadow:0 6px 20px rgba(212,175,55,.2);
+    }
+    .upi-app-btn img { width:40px; height:40px; object-fit:contain; border-radius:8px; }
+    .upi-app-btn span {
+      font-family:var(--font); font-size:.6rem; font-weight:700;
+      letter-spacing:.1em; color:var(--cream); text-transform:uppercase;
+    }
+    .upi-pay-now-btn {
+      width:100%; padding:14px; margin-top:4px;
+      background:linear-gradient(135deg,#4B0E4E,#7b1f80);
+      border:2px solid var(--gold); color:var(--gold);
+      font-family:var(--font); font-weight:700; font-size:.78rem;
+      letter-spacing:.2em; text-transform:uppercase; cursor:pointer;
+      border-radius:4px; transition:all .25s; display:none;
+    }
+    .upi-pay-now-btn.visible { display:block; }
+    .upi-pay-now-btn:hover { background:var(--gold); color:var(--royal); }
 </style>
 </head>
 <body>
@@ -1657,13 +1693,50 @@
         <!-- UPI Info -->
         <div id="upiSection">
           <div class="upi-discount-badge">🎉 ₹50 Discount on UPI Payment!</div>
-          <div class="qr-box">
-            <img src="https://raw.githubusercontent.com/gaayathrisarees/gaayathrisarees/main/images/Qr.jpeg" alt="UPI QR Code"/>
-            <p>Scan & Pay · UPI ID: gpay-12203208782@okbizaxis</p>
-            <p style="font-size:.65rem;margin-top:4px;color:rgba(212,175,55,.7);">Paytm · Google Pay · PhonePe · BHIM</p>
+
+          <!-- UPI App Selection -->
+          <p class="upi-apps-label">Choose your UPI App to Pay</p>
+          <div class="upi-apps-row">
+            <button class="upi-app-btn" id="upiAppGpay" onclick="selectUpiApp('gpay')" title="Google Pay">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/512px-Google_Pay_Logo.svg.png"
+                   onerror="this.src='https://raw.githubusercontent.com/gaayathrisarees/gaayathrisarees/main/images/onlylogo.png'"
+                   alt="Google Pay"/>
+              <span>GPay</span>
+            </button>
+            <button class="upi-app-btn" id="upiAppPhonepe" onclick="selectUpiApp('phonepe')" title="PhonePe">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/PhonePe_Logo.png/220px-PhonePe_Logo.png"
+                   onerror="this.src='https://raw.githubusercontent.com/gaayathrisarees/gaayathrisarees/main/images/onlylogo.png'"
+                   alt="PhonePe"/>
+              <span>PhonePe</span>
+            </button>
+            <button class="upi-app-btn" id="upiAppPaytm" onclick="selectUpiApp('paytm')" title="Paytm">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Paytm_Logo_%28standalone%29.svg/512px-Paytm_Logo_%28standalone%29.svg.png"
+                   onerror="this.src='https://raw.githubusercontent.com/gaayathrisarees/gaayathrisarees/main/images/onlylogo.png'"
+                   alt="Paytm"/>
+              <span>Paytm</span>
+            </button>
+            <button class="upi-app-btn" id="upiAppBhim" onclick="selectUpiApp('bhim')" title="BHIM UPI">
+              <img src="https://upload.wikimedia.org/wikipedia/en/thumb/6/6b/BHIM_logo.svg/250px-BHIM_logo.svg.png"
+                   onerror="this.src='https://raw.githubusercontent.com/gaayathrisarees/gaayathrisarees/main/images/onlylogo.png'"
+                   alt="BHIM UPI"/>
+              <span>BHIM</span>
+            </button>
           </div>
+
+          <!-- Pay Now button — appears after app selection -->
+          <button class="upi-pay-now-btn" id="upiPayNowBtn" onclick="openUpiApp()">
+            ⚡ Pay Now — Open App
+          </button>
+
+          <!-- OR scan QR -->
+          <div class="qr-box" style="margin-top:14px;">
+            <p style="font-family:var(--font);font-size:.65rem;color:rgba(212,175,55,.6);letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px;">— or Scan QR Code —</p>
+            <img src="https://raw.githubusercontent.com/gaayathrisarees/gaayathrisarees/main/images/Qr.jpeg" alt="UPI QR Code"/>
+            <p>UPI ID: gpay-12203208782@okbizaxis</p>
+          </div>
+
           <div class="upi-paid-confirm">
-            <p>📸 After payment, enter your UPI Transaction ID to confirm:</p>
+            <p>📸 Payment chesina tarvata, Transaction ID enter cheyyandi:</p>
             <input id="upiTxnInput" type="text" placeholder="Enter Transaction ID / UTR number"/>
             <button id="upiConfirmBtn" onclick="confirmUpiPayment()">✅ Confirm Payment</button>
             <div id="upiPaidBadge">✅ PAYMENT CONFIRMED — ₹50 Discount Applied!</div>
@@ -2119,6 +2192,14 @@
 
     function closeOrderModal() {
       document.getElementById('orderModal').style.display = 'none';
+      // Reset UPI app selection
+      selectedUpiApp = null;
+      ['gpay','phonepe','paytm','bhim'].forEach(a => {
+        const btn = document.getElementById('upiApp' + a.charAt(0).toUpperCase() + a.slice(1));
+        if (btn) btn.classList.remove('active');
+      });
+      const payNow = document.getElementById('upiPayNowBtn');
+      if (payNow) payNow.classList.remove('visible');
     }
 
     /* ── DELIVERY CALC — BHEL (502032) prime location, FREE within 30 km ── */
@@ -2247,6 +2328,87 @@
       document.getElementById('upiPaidBadge').classList.add('show');
       document.getElementById('upiConfirmBtn').disabled = true;
       document.getElementById('upiConfirmBtn').textContent = '✅ Confirmed';
+    }
+
+    /* ── UPI APP DEEP LINK ── */
+    let selectedUpiApp = null;
+
+    function selectUpiApp(app) {
+      selectedUpiApp = app;
+      // Highlight selected
+      ['gpay','phonepe','paytm','bhim'].forEach(a => {
+        const btn = document.getElementById('upiApp' + a.charAt(0).toUpperCase() + a.slice(1));
+        if (btn) btn.classList.toggle('active', a === app);
+      });
+      document.getElementById('upiPayNowBtn').classList.add('visible');
+      updatePayNowLabel();
+    }
+
+    function updatePayNowLabel() {
+      const btn = document.getElementById('upiPayNowBtn');
+      if (!btn || !selectedUpiApp) return;
+      const unitPrice = currentItem.price || 0;
+      const qty = currentItem.qty || 1;
+      const sub = unitPrice * qty;
+      const gstRate = getAdminSetting('gsGstRate', 5) / 100;
+      const gst = Math.round(sub * gstRate);
+      const pincode = document.getElementById('oPincode') ? document.getElementById('oPincode').value.trim() : '';
+      const km = estimateKm(pincode);
+      const freeKm = getAdminSetting('gsFreeKm', 30);
+      const rateKm = getAdminSetting('gsRateKm', 2);
+      const freeOrd = getAdminSetting('gsFreeOrders', 2);
+      const orderNo = getOrderCount();
+      const delivery = (km === null || km <= freeKm || orderNo < freeOrd) ? 0 : km * rateKm;
+      const total = sub + gst + delivery - 50; // ₹50 UPI discount
+      const appNames = { gpay:'Google Pay', phonepe:'PhonePe', paytm:'Paytm', bhim:'BHIM' };
+      btn.textContent = `⚡ Pay ₹${total.toLocaleString('en-IN')} via ${appNames[selectedUpiApp] || 'UPI'}`;
+    }
+
+    function openUpiApp() {
+      const unitPrice = currentItem.price || 0;
+      const qty = currentItem.qty || 1;
+      const sub = unitPrice * qty;
+      const gstRate = getAdminSetting('gsGstRate', 5) / 100;
+      const gst = Math.round(sub * gstRate);
+      const pincode = document.getElementById('oPincode') ? document.getElementById('oPincode').value.trim() : '';
+      const km = estimateKm(pincode);
+      const freeKm = getAdminSetting('gsFreeKm', 30);
+      const rateKm = getAdminSetting('gsRateKm', 2);
+      const freeOrd = getAdminSetting('gsFreeOrders', 2);
+      const orderNo = getOrderCount();
+      const delivery = (km === null || km <= freeKm || orderNo < freeOrd) ? 0 : km * rateKm;
+      const total = sub + gst + delivery - 50;
+
+      const upiId = 'gpay-12203208782@okbizaxis';
+      const payeeName = encodeURIComponent('Gaayathri Sarees');
+      const amount = total.toFixed(2);
+      const note = encodeURIComponent((currentItem.name || 'Saree').substring(0, 40));
+      const orderRef = 'GS-' + Date.now().toString().slice(-6);
+
+      // Universal UPI intent link (works on all apps)
+      const upiLink = `upi://pay?pa=${upiId}&pn=${payeeName}&am=${amount}&cu=INR&tn=${note}&tr=${orderRef}`;
+
+      // App-specific deep links
+      const deepLinks = {
+        gpay:    `gpay://upi/pay?pa=${upiId}&pn=${payeeName}&am=${amount}&cu=INR&tn=${note}`,
+        phonepe: `phonepe://pay?pa=${upiId}&pn=${payeeName}&am=${amount}&cu=INR&tn=${note}`,
+        paytm:   `paytmmp://pay?pa=${upiId}&pn=${payeeName}&am=${amount}&cu=INR&tn=${note}`,
+        bhim:    `upi://pay?pa=${upiId}&pn=${payeeName}&am=${amount}&cu=INR&tn=${note}`
+      };
+
+      const link = deepLinks[selectedUpiApp] || upiLink;
+
+      // Try app-specific link first, fallback to universal UPI
+      const a = document.createElement('a');
+      a.href = link;
+      a.click();
+
+      // Fallback after 1.5s if app didn't open
+      setTimeout(() => {
+        const fb = document.createElement('a');
+        fb.href = upiLink;
+        fb.click();
+      }, 1500);
     }
 
     /* ── ADMIN SETTINGS HELPERS ── */
