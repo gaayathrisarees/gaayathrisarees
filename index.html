@@ -1137,43 +1137,13 @@
        NAVBAR
   ══════════════════════════════════ -->
   <nav>
-    <a href="#" class="nav-logo" style="display:flex;align-items:center;text-decoration:none;">
+    <a href="#" class="nav-logo" id="navLogoBtn" style="display:flex;align-items:center;text-decoration:none;" onclick="handleLogoClick(event)">
       <img src="images/wideLogo.png" alt="Gaayathri Sarees Logo"
            onerror="this.style.display='none'"/>
     </a>
     <div class="hamburger" id="hamburger" onclick="toggleNav()">
       <span></span><span></span><span></span>
     </div>
-    <button onclick="openAdminLogin()" id="adminNavBtn" style="
-      background: var(--gold);
-      border: 1.5px solid var(--gold);
-      color: var(--royal);
-      font-family: var(--font);
-      font-size: .52rem;
-      font-weight: 700;
-      letter-spacing: .2em;
-      text-transform: uppercase;
-      padding: 7px 18px 7px 14px;
-      cursor: pointer;
-      border-radius: 50px;
-      transition: all .3s cubic-bezier(.4,0,.2,1);
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      box-shadow: 0 2px 10px rgba(212,175,55,.4);
-    "
-    onmouseover="
-      this.style.background='var(--gold-lt)';
-      this.style.transform='translateY(-1px) scale(1.04)';
-      this.style.boxShadow='0 4px 16px rgba(212,175,55,.6)';
-    "
-    onmouseout="
-      this.style.background='var(--gold)';
-      this.style.transform='translateY(0) scale(1)';
-      this.style.boxShadow='0 2px 10px rgba(212,175,55,.4)';
-    ">
-      ⚙ Admin
-    </button>
     <ul class="nav-links" id="navLinks">
       <li><a href="#collections">Most Ordered</a></li>
       <li><a href="#categories">Categories</a></li>
@@ -1270,7 +1240,7 @@
         <div class="product-card-info">
           <h3>Chanderi Silk Cotton</h3>
           <p>Sheer · Lightweight Summer</p>
-          <div class="product-price"><del>₹3,800</del>₹100</div>
+          <div class="product-price"><del>₹3,800</del>₹2,699</div>
           <button class="add-to-cart" onclick="addToCart(this)">Add to Cart</button>
         </div>
       </div>
@@ -1515,6 +1485,7 @@
     <div class="footer-bottom">
       <p>© 2025 Gaayathri Sarees · Mac Society, BHEL Township, Hyderabad 502032</p>
       <p style="color:rgba(212,175,55,.4);">📞 9666041369</p>
+      <p id="footerGstNo" style="color:rgba(212,175,55,.35);font-size:.65rem;letter-spacing:.1em;display:none;"></p>
     </div>
   </footer>
 
@@ -1697,6 +1668,10 @@
           </div>
         </div>
         <p id="deliveryNote" style="font-family:var(--font);font-size:.65rem;color:rgba(212,175,55,.6);margin-top:10px;letter-spacing:.06em;"></p>
+        <!-- Estimated Delivery Date -->
+        <div id="deliveryDateBox" style="margin-top:12px;background:rgba(46,120,59,.12);border:1px solid rgba(109,220,130,.3);padding:10px 14px;border-radius:2px;display:none;">
+          <span style="font-family:var(--font);font-size:.68rem;color:#6ddc82;letter-spacing:.1em;">🚚 Estimated Delivery: <strong id="deliveryDateVal" style="color:#fff;"></strong></span>
+        </div>
       </div>
 
       <!-- Payment Method Selection -->
@@ -1804,6 +1779,23 @@
       });
       setTimeout(dismiss, 6000);
     })();
+
+    /* ── LOGO HIDDEN ADMIN ACCESS (triple-click within 2s) ── */
+    let logoClickCount = 0, logoClickTimer = null;
+    function handleLogoClick(e) {
+      e.preventDefault();
+      logoClickCount++;
+      if (logoClickTimer) clearTimeout(logoClickTimer);
+      if (logoClickCount >= 3) {
+        logoClickCount = 0;
+        openAdminLogin();
+        return;
+      }
+      logoClickTimer = setTimeout(() => {
+        logoClickCount = 0;
+        window.location.href = '#home';
+      }, 600);
+    }
 
     /* ── MOBILE NAV TOGGLE ── */
     function toggleNav() {
@@ -2221,6 +2213,8 @@
         document.getElementById('freeDeliveryBanner').style.display = 'flex';
       }
       document.getElementById('orderModal').style.display = 'block';
+      // Show default delivery date (next day, refined after pincode entry)
+      showDeliveryDate(null);
     }
 
     function closeOrderModal() {
@@ -2266,10 +2260,37 @@
       return 400;
     }
 
+    /* ── ESTIMATE DELIVERY DATE based on km distance ── */
+    function getEstimatedDeliveryDate(km) {
+      const now = new Date();
+      let daysToAdd = 1; // default next day
+      if (km === null || km === undefined) daysToAdd = 1;
+      else if (km <= 30)  daysToAdd = 1;
+      else if (km <= 80)  daysToAdd = 2;
+      else if (km <= 300) daysToAdd = 3;
+      else if (km <= 600) daysToAdd = 5;
+      else                daysToAdd = 7;
+      const delivDate = new Date(now.getTime() + daysToAdd * 24 * 60 * 60 * 1000);
+      const options = { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' };
+      return {
+        label: delivDate.toLocaleDateString('en-IN', options),
+        days: daysToAdd
+      };
+    }
+
+    function showDeliveryDate(km) {
+      const box = document.getElementById('deliveryDateBox');
+      const val = document.getElementById('deliveryDateVal');
+      if (!box || !val) return;
+      const est = getEstimatedDeliveryDate(km);
+      val.textContent = est.label + (est.days === 1 ? ' (Tomorrow)' : ` (${est.days} days)`);
+      box.style.display = 'block';
+    }
+
     function calcDelivery() {
       const pincode = document.getElementById('oPincode').value.trim();
       const km = estimateKm(pincode);
-      if (km === null) { updatePriceSummary(null, pincode); return; }
+      if (km === null) { updatePriceSummary(null, pincode); showDeliveryDate(null); return; }
       /* Free if within 30 km OR first 2 orders */
       const freeKmD = window.FREE_DELIVERY_RADIUS_KM || getAdminSetting('gsFreeKm', 30);
       const rateKmD = window.RATE_PER_KM || getAdminSetting('gsRateKm', 2);
@@ -2279,6 +2300,7 @@
         ? 0
         : km * rateKmD;
       updatePriceSummary(delivery, pincode, km);
+      showDeliveryDate(km);
     }
 
     function updatePriceSummary(delivery, pincode, km) {
@@ -2472,6 +2494,10 @@
       return v !== null ? parseFloat(v) : def;
     }
     function getAdminStrSetting(key, def) {
+      // Default GST number pre-set
+      if (key === 'gsGstNo' && !localStorage.getItem(key)) {
+        localStorage.setItem('gsGstNo', '36ELKPG6468M1ZC');
+      }
       return localStorage.getItem(key) || def;
     }
 
@@ -2515,6 +2541,10 @@
       const bizName   = getAdminStrSetting('gsBizName', 'Gaayathri Sarees');
       const gstNo     = getAdminStrSetting('gsGstNo', '');
       const gstRatePct= getAdminSetting('gsGstRate', 5);
+
+      /* ── DELIVERY DATE ESTIMATE ── */
+      const delivEst  = getEstimatedDeliveryDate(km);
+      const deliveryDateStr = delivEst.label;
 
       /* ── SAVE ORDER to localStorage ── */
       const orderRecord = {
@@ -2719,6 +2749,7 @@
         ['Phone',           phone],
         ...(altPhone ? [['Alt. Phone', altPhone]] : []),
         ['Delivery Address', address],
+        ['Est. Delivery',   '📅 ' + deliveryDateStr],
         ['Payment Mode',    payMethod === 'COD' ? 'Cash on Delivery' : (upiConfirmed ? 'UPI — PAID ✓ (Txn: ' + txnRef + ')' : 'UPI — Pending')],
       ];
       doc.setFontSize(9);
@@ -2783,6 +2814,7 @@
         `*Delivery:* ${delivery === 0 ? 'FREE' : '₹' + delivery.toLocaleString('en-IN')}\n` +
         (upiDiscount > 0 ? `*UPI Discount:* -₹${upiDiscount}\n` : '') +
         `*Total:* ₹${total.toLocaleString('en-IN')}\n` +
+        `*Estimated Delivery:* 📅 ${deliveryDateStr}\n` +
         `${payInfo}\n\n` +
         `👤 *Customer Details*\n` +
         `Name: ${name}\nPhone: ${phone}\n` +
@@ -2792,6 +2824,33 @@
 
       incrementOrderCount();
       window.open('https://wa.me/919666041369?text=' + encodeURIComponent(waText), '_blank');
+
+      /* ── TRIGGER ADMIN ORDER NOTIFICATION POPUP ── */
+      (function showAdminNotif() {
+        const notif = document.getElementById('adminOrderNotif');
+        const body  = document.getElementById('adminOrderNotifBody');
+        if (!notif || !body) return;
+        const payBadge = payMethod === 'COD'
+          ? '<span style="background:#e67e22;color:#fff;font-size:.58rem;padding:2px 8px;border-radius:2px;font-family:var(--font);letter-spacing:.1em;">COD</span>'
+          : (upiConfirmed
+            ? '<span style="background:#27ae60;color:#fff;font-size:.58rem;padding:2px 8px;border-radius:2px;font-family:var(--font);letter-spacing:.1em;">UPI PAID ✓</span>'
+            : '<span style="background:#3498db;color:#fff;font-size:.58rem;padding:2px 8px;border-radius:2px;font-family:var(--font);letter-spacing:.1em;">UPI PENDING</span>');
+        body.innerHTML =
+          `<div class="notif-latest-tag">✦ Latest Message</div>` +
+          `<div class="notif-row"><span class="lbl">Order No</span><span class="val" style="color:var(--gold);">${orderNo}</span></div>` +
+          `<div class="notif-row"><span class="lbl">Date</span><span class="val">${orderDate}</span></div>` +
+          `<div class="notif-row"><span class="lbl">Customer</span><span class="val">${name}</span></div>` +
+          `<div class="notif-row"><span class="lbl">Phone</span><span class="val">${phone}</span></div>` +
+          `<div class="notif-row"><span class="lbl">Address</span><span class="val" style="max-width:200px;font-size:.65rem;">${address}</span></div>` +
+          `<div class="notif-row"><span class="lbl">Item</span><span class="val" style="max-width:180px;font-size:.68rem;">${currentItem.name} × ${qty}</span></div>` +
+          `<div class="notif-row"><span class="lbl">Total</span><span class="val" style="color:var(--gold);font-size:.9rem;">₹${total.toLocaleString('en-IN')}</span></div>` +
+          `<div class="notif-row"><span class="lbl">Payment</span><span class="val">${payBadge}</span></div>` +
+          `<div class="notif-row"><span class="lbl">Est. Delivery</span><span class="val" style="color:#6ddc82;">📅 ${deliveryDateStr}</span></div>` +
+          (upiConfirmed && txnRef ? `<div class="notif-row"><span class="lbl">UTR Ref</span><span class="val" style="font-size:.65rem;">${txnRef}</span></div>` : '');
+        notif.style.display = 'block';
+        // Auto-dismiss after 30 seconds
+        setTimeout(() => { notif.style.display = 'none'; }, 30000);
+      })();
 
       /* ── EMAIL ── */
       setTimeout(async () => {
@@ -2845,6 +2904,7 @@
               (altPhone ? `<tr><td style="color:#c0b0d0;padding:6px 0;font-size:13px;">Alt Phone</td><td style="color:#FDF6E3;">${altPhone}</td></tr>` : '') +
               (custEmail ? `<tr><td style="color:#c0b0d0;padding:6px 0;font-size:13px;">Email</td><td style="color:#FDF6E3;">${custEmail}</td></tr>` : '') +
               `<tr><td style="color:#c0b0d0;padding:6px 0;font-size:13px;">Address</td><td style="color:#FDF6E3;">${address}</td></tr>` +
+              `<tr><td style="color:#c0b0d0;padding:6px 0;font-size:13px;">Est. Delivery</td><td style="color:#6ddc82;font-weight:bold;">📅 ${deliveryDateStr}</td></tr>` +
               `</table></div>` +
               (payMethod === 'COD' ?
                 `<div style="background:rgba(230,126,34,0.12);border:1px solid rgba(230,126,34,0.4);border-radius:6px;padding:12px 16px;text-align:center;margin-bottom:6px;">` +
@@ -2863,6 +2923,7 @@
               `<div style="background:#4B0E4E;padding:16px 30px;text-align:center;border-top:1px solid rgba(212,175,55,0.4);">` +
               `<p style="color:#D4AF37;margin:0 0 4px;font-size:12px;font-weight:bold;">Gaayathri Sarees</p>` +
               `<p style="color:rgba(253,246,227,0.6);margin:0;font-size:11px;">📞 +91 9666041369 &nbsp;|&nbsp; gaayathrisarees@gmail.com</p>` +
+              (gstNo ? `<p style="color:rgba(212,175,55,0.6);margin:4px 0 0;font-size:10px;">GSTIN: ${gstNo}</p>` : '') +
               `<p style="color:rgba(253,246,227,0.4);margin:6px 0 0;font-size:10px;">Mac Society, BHEL Township, Hyderabad 502032</p>` +
               `</div>` +
               `</div>`
@@ -2915,7 +2976,7 @@
             ? `⏳ UPI UTR submitted (${txnRef}) — మేము GPay లో verify చేసి 2-4 గంటల్లో confirm చేస్తాము. Confirm తర్వాతే dispatch!`
             : '📲 UPI Payment — UTR submit చేయలేదు, payment verify కాదు');
         const emailNote = custEmail ? `📧 Invoice email sent to ${custEmail}` : `📧 Email sent to Gaayathri Sarees`;
-        alert(`✅ Order Placed! — ${orderNo}\n\n📄 Invoice PDF downloaded\n📱 WhatsApp కి UTR పంపించాం\n${emailNote}\n\n${payMsg}\n\nThank you for shopping with Gaayathri Sarees! 🌸`);
+        alert(`✅ Order Placed! — ${orderNo}\n\n📄 Invoice PDF downloaded\n📱 WhatsApp కి UTR పంపించాం\n${emailNote}\n\n📅 Estimated Delivery: ${deliveryDateStr}\n\n${payMsg}\n\nThank you for shopping with Gaayathri Sarees! 🌸`);
       }, 500);
     }
     /* ── HELPER: fetch image as base64 ── */
@@ -3158,7 +3219,7 @@
 
     function loadGstTab() {
       document.getElementById('adminGstRate').value = getAdminSetting('gsGstRate', 5);
-      document.getElementById('adminGstNo').value = getAdminStrSetting('gsGstNo', '');
+      document.getElementById('adminGstNo').value = getAdminStrSetting('gsGstNo', '36ELKPG6468M1ZC');
       document.getElementById('adminBizName').value = getAdminStrSetting('gsBizName', 'Gaayathri Sarees');
       document.getElementById('adminCodNote').value = getAdminStrSetting('gsCodNote', 'Pay cash at doorstep on delivery.');
       updateGstPreview();
@@ -3223,10 +3284,15 @@
       window.RATE_PER_KM = rateKm;
     }
 
-    // On page load, apply saved delivery settings
     document.addEventListener('DOMContentLoaded', function() {
       window.FREE_DELIVERY_RADIUS_KM = getAdminSetting('gsFreeKm', 30);
       window.RATE_PER_KM = getAdminSetting('gsRateKm', 2);
+      // Show GST number in footer
+      const gstNoFooter = getAdminStrSetting('gsGstNo', '36ELKPG6468M1ZC');
+      if (gstNoFooter) {
+        const el = document.getElementById('footerGstNo');
+        if (el) { el.textContent = 'GSTIN: ' + gstNoFooter; el.style.display = 'block'; }
+      }
     });
 </script>
 
@@ -3377,6 +3443,75 @@
           <p style="font-family:var(--font);font-size:.62rem;color:rgba(253,246,227,.35);margin-top:8px;letter-spacing:.04em;">Download tarvata: GitHub repo → gs-settings.js upload cheyyi → Done! ✅</p>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       ADMIN ORDER NOTIFICATION POPUP
+  ══════════════════════════════════ -->
+  <div id="adminOrderNotif" style="display:none;position:fixed;top:24px;right:24px;z-index:9000;max-width:380px;width:calc(100vw - 48px);background:linear-gradient(145deg,#2d0640,#1a0320);border:2px solid var(--gold);box-shadow:0 12px 50px rgba(0,0,0,.85),0 0 0 1px rgba(212,175,55,.15);animation:notifSlideIn .4s cubic-bezier(.22,.88,.34,1) forwards;">
+    <style>
+      @keyframes notifSlideIn {
+        from { opacity:0; transform:translateX(60px) scale(.96); }
+        to   { opacity:1; transform:translateX(0)    scale(1);   }
+      }
+      #adminOrderNotif .notif-header {
+        background:var(--gold);
+        padding:10px 16px;
+        display:flex; align-items:center; justify-content:space-between;
+      }
+      #adminOrderNotif .notif-header span {
+        font-family:var(--font); font-size:.72rem; font-weight:700;
+        letter-spacing:.18em; text-transform:uppercase; color:var(--royal);
+      }
+      #adminOrderNotif .notif-body {
+        padding:16px 18px;
+        font-family:var(--font);
+        font-size:.75rem;
+        color:var(--cream);
+        line-height:1.8;
+      }
+      #adminOrderNotif .notif-row {
+        display:flex; gap:10px; justify-content:space-between;
+        border-bottom:1px solid rgba(212,175,55,.12); padding:4px 0;
+        font-size:.72rem;
+      }
+      #adminOrderNotif .notif-row .lbl { color:rgba(212,175,55,.7); }
+      #adminOrderNotif .notif-row .val { color:var(--cream); font-weight:700; text-align:right; }
+      #adminOrderNotif .notif-close {
+        background:transparent; border:none; color:var(--royal);
+        font-size:1.1rem; cursor:pointer; line-height:1; padding:0 4px;
+      }
+      #adminOrderNotif .notif-footer {
+        padding:10px 16px;
+        display:flex; gap:10px; justify-content:flex-end;
+        border-top:1px solid rgba(212,175,55,.2);
+      }
+      #adminOrderNotif .notif-btn-open {
+        background:var(--gold); border:none; color:var(--royal);
+        font-family:var(--font); font-size:.65rem; font-weight:700;
+        letter-spacing:.14em; text-transform:uppercase; padding:8px 16px; cursor:pointer;
+      }
+      #adminOrderNotif .notif-btn-dismiss {
+        background:transparent; border:1px solid rgba(212,175,55,.4); color:var(--gold);
+        font-family:var(--font); font-size:.65rem; letter-spacing:.1em; padding:8px 14px; cursor:pointer;
+      }
+      #adminOrderNotif .notif-latest-tag {
+        display:inline-block; background:rgba(109,220,130,.18); border:1px solid #6ddc82;
+        color:#6ddc82; font-size:.6rem; letter-spacing:.18em; padding:2px 8px;
+        text-transform:uppercase; margin-bottom:10px;
+      }
+    </style>
+    <div class="notif-header">
+      <span>🛍️ New Order Received</span>
+      <button class="notif-close" onclick="document.getElementById('adminOrderNotif').style.display='none'">✕</button>
+    </div>
+    <div class="notif-body" id="adminOrderNotifBody">
+      <!-- Populated by JS -->
+    </div>
+    <div class="notif-footer">
+      <button class="notif-btn-dismiss" onclick="document.getElementById('adminOrderNotif').style.display='none'">Dismiss</button>
+      <button class="notif-btn-open" onclick="document.getElementById('adminOrderNotif').style.display='none';openAdminLogin();">View Admin Panel →</button>
     </div>
   </div>
 
