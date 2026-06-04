@@ -39,7 +39,7 @@
     // 2. Enter: gaayathrisarees@gmail.com  → click "Get Access Key"
     // 3. Check your Gmail inbox → copy the key → paste below
     // ══════════════════════════════════════════════════════
-    const WEB3FORMS_KEY = 'a3cbc38b-9a07-401e-a677-e6c512c0905b';
+    const WEB3FORMS_KEY = '2802196b-c61b-489b-85e8-a2498914787f';
     // example: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890'
   </script>
 
@@ -1100,6 +1100,14 @@
       border-color:var(--gold); background:rgba(212,175,55,.12);
       transform:translateY(-2px); box-shadow:0 6px 20px rgba(212,175,55,.2);
     }
+    .upi-icon-box {
+      width:52px; height:52px; border-radius:10px;
+      display:flex; align-items:center; justify-content:center;
+      overflow:hidden; flex-shrink:0;
+    }
+    .upi-icon-box img {
+      width:44px; height:44px; object-fit:contain; display:block;
+    }
     .upi-app-btn img { width:40px; height:40px; object-fit:contain; border-radius:8px; }
     .upi-app-btn span {
       font-family:var(--font); font-size:.6rem; font-weight:700;
@@ -1696,27 +1704,27 @@
           <p class="upi-apps-label">Choose your UPI App to Pay</p>
           <div class="upi-apps-row">
             <button class="upi-app-btn" id="upiAppGpay" onclick="selectUpiApp('gpay')" title="Google Pay">
-              <img src="https://www.gstatic.com/instantbuy/svg/googlepay_dark.svg"
-                   onerror="this.onerror=null;this.src='https://pay.google.com/about/static_kcs/images/logos/google-pay-logo.svg';this.onerror=function(){this.style.display='none';this.parentNode.insertAdjacentHTML('afterbegin','<span style=\'font-size:1.6rem\'>G</span>');};"
-                   alt="Google Pay" style="border-radius:6px;"/>
+              <div class="upi-icon-box" style="background:#fff;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/512px-Google_Pay_Logo.svg.png" alt="Google Pay"/>
+              </div>
               <span>GPay</span>
             </button>
             <button class="upi-app-btn" id="upiAppPhonepe" onclick="selectUpiApp('phonepe')" title="PhonePe">
-              <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/phonepe.svg"
-                   onerror="this.onerror=null;this.style.display='none';this.parentNode.insertAdjacentHTML('afterbegin','<span style=\'font-size:1.6rem;color:#5f259f\'>Pe</span>');"
-                   alt="PhonePe" style="border-radius:10px;background:#5f259f;padding:4px;"/>
+              <div class="upi-icon-box" style="background:#5f259f;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/PhonePe_Logo.png/220px-PhonePe_Logo.png" alt="PhonePe"/>
+              </div>
               <span>PhonePe</span>
             </button>
             <button class="upi-app-btn" id="upiAppPaytm" onclick="selectUpiApp('paytm')" title="Paytm">
-              <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/paytm.svg"
-                   onerror="this.onerror=null;this.style.display='none';this.parentNode.insertAdjacentHTML('afterbegin','<span style=\'font-size:1.6rem;color:#00b9f5\'>PT</span>');"
-                   alt="Paytm" style="border-radius:6px;background:#00b9f5;padding:4px;"/>
+              <div class="upi-icon-box" style="background:#00b9f5;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Paytm_Logo_%28standalone%29.svg/512px-Paytm_Logo_%28standalone%29.svg.png" alt="Paytm"/>
+              </div>
               <span>Paytm</span>
             </button>
             <button class="upi-app-btn" id="upiAppBhim" onclick="selectUpiApp('bhim')" title="BHIM UPI">
-              <img src="https://www.npci.org.in/assets/images/bhim.png"
-                   onerror="this.onerror=null;this.src='https://upload.wikimedia.org/wikipedia/en/thumb/6/6b/BHIM_logo.svg/250px-BHIM_logo.svg.png';this.onerror=function(){this.style.display='none';this.parentNode.insertAdjacentHTML('afterbegin','<span style=\'font-size:1.4rem;color:#00529b\'>BHIM</span>');};"
-                   alt="BHIM UPI" style="border-radius:6px;"/>
+              <div class="upi-icon-box" style="background:#00529b;">
+                <img src="https://upload.wikimedia.org/wikipedia/en/thumb/6/6b/BHIM_logo.svg/250px-BHIM_logo.svg.png" alt="BHIM UPI"/>
+              </div>
               <span>BHIM</span>
             </button>
           </div>
