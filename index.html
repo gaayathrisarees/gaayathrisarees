@@ -1696,27 +1696,27 @@
           <p class="upi-apps-label">Choose your UPI App to Pay</p>
           <div class="upi-apps-row">
             <button class="upi-app-btn" id="upiAppGpay" onclick="selectUpiApp('gpay')" title="Google Pay">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/512px-Google_Pay_Logo.svg.png"
-                   onerror="this.src='https://raw.githubusercontent.com/gaayathrisarees/gaayathrisarees/main/images/onlylogo.png'"
-                   alt="Google Pay"/>
+              <img src="https://www.gstatic.com/instantbuy/svg/googlepay_dark.svg"
+                   onerror="this.onerror=null;this.src='https://pay.google.com/about/static_kcs/images/logos/google-pay-logo.svg';this.onerror=function(){this.style.display='none';this.parentNode.insertAdjacentHTML('afterbegin','<span style=\'font-size:1.6rem\'>G</span>');};"
+                   alt="Google Pay" style="border-radius:6px;"/>
               <span>GPay</span>
             </button>
             <button class="upi-app-btn" id="upiAppPhonepe" onclick="selectUpiApp('phonepe')" title="PhonePe">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/PhonePe_Logo.png/220px-PhonePe_Logo.png"
-                   onerror="this.src='https://raw.githubusercontent.com/gaayathrisarees/gaayathrisarees/main/images/onlylogo.png'"
-                   alt="PhonePe"/>
+              <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/phonepe.svg"
+                   onerror="this.onerror=null;this.style.display='none';this.parentNode.insertAdjacentHTML('afterbegin','<span style=\'font-size:1.6rem;color:#5f259f\'>Pe</span>');"
+                   alt="PhonePe" style="border-radius:10px;background:#5f259f;padding:4px;"/>
               <span>PhonePe</span>
             </button>
             <button class="upi-app-btn" id="upiAppPaytm" onclick="selectUpiApp('paytm')" title="Paytm">
-              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Paytm_Logo_%28standalone%29.svg/512px-Paytm_Logo_%28standalone%29.svg.png"
-                   onerror="this.src='https://raw.githubusercontent.com/gaayathrisarees/gaayathrisarees/main/images/onlylogo.png'"
-                   alt="Paytm"/>
+              <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/paytm.svg"
+                   onerror="this.onerror=null;this.style.display='none';this.parentNode.insertAdjacentHTML('afterbegin','<span style=\'font-size:1.6rem;color:#00b9f5\'>PT</span>');"
+                   alt="Paytm" style="border-radius:6px;background:#00b9f5;padding:4px;"/>
               <span>Paytm</span>
             </button>
             <button class="upi-app-btn" id="upiAppBhim" onclick="selectUpiApp('bhim')" title="BHIM UPI">
-              <img src="https://upload.wikimedia.org/wikipedia/en/thumb/6/6b/BHIM_logo.svg/250px-BHIM_logo.svg.png"
-                   onerror="this.src='https://raw.githubusercontent.com/gaayathrisarees/gaayathrisarees/main/images/onlylogo.png'"
-                   alt="BHIM UPI"/>
+              <img src="https://www.npci.org.in/assets/images/bhim.png"
+                   onerror="this.onerror=null;this.src='https://upload.wikimedia.org/wikipedia/en/thumb/6/6b/BHIM_logo.svg/250px-BHIM_logo.svg.png';this.onerror=function(){this.style.display='none';this.parentNode.insertAdjacentHTML('afterbegin','<span style=\'font-size:1.4rem;color:#00529b\'>BHIM</span>');};"
+                   alt="BHIM UPI" style="border-radius:6px;"/>
               <span>BHIM</span>
             </button>
           </div>
@@ -2375,30 +2375,81 @@
       if (el) el.textContent = `Amount to pay: ₹${total.toLocaleString('en-IN')} (Cash at doorstep)`;
     }
 
-    /* ── UTR FORMAT VALIDATION ── */
+    /* ── ANTI-FRAUD UTR VALIDATION ── */
+    const _submittedUtrs = new Set();
+
     function validateUtr(val) {
       const hint = document.getElementById('utrHint');
-      if (!val) { hint.className = 'utr-hint'; hint.textContent = ''; return false; }
-      // UTR: 12-digit number, or alphanumeric 12–22 chars (some banks differ)
-      const isValid = /^[0-9]{12}$/.test(val) || /^[A-Za-z0-9]{12,22}$/.test(val);
-      if (isValid) {
-        hint.className = 'utr-hint valid';
-        hint.textContent = '✓ Valid UTR format';
-      } else {
+      if (!val) { hint.className = 'utr-hint'; hint.textContent = ''; return { valid: false, reason: '' }; }
+
+      const v = val.trim().toUpperCase();
+
+      // 1. Blocked fake/test values
+      const BLOCKED = ['123456789012','000000000000','111111111111','999999999999','123456789','12345678','TEST','FAKE','DEMO'];
+      if (BLOCKED.some(b => v === b || v.startsWith(b))) {
         hint.className = 'utr-hint invalid';
-        hint.textContent = '✗ UTR usually 12 digits — double check cheyyandi';
+        hint.textContent = '🚫 Invalid UTR — bank app లో real UTR copy cheyyandi';
+        return { valid: false, reason: 'blocked' };
       }
-      return isValid;
+
+      // 2. All same repeated digits
+      if (/^(.)\1{11,}$/.test(v)) {
+        hint.className = 'utr-hint invalid';
+        hint.textContent = '🚫 UTR valid కాదు — bank payment history లో UTR copy cheyyandi';
+        return { valid: false, reason: 'repeated' };
+      }
+
+      // 3. Sequential digits
+      if (/^0?123456789/.test(v)) {
+        hint.className = 'utr-hint invalid';
+        hint.textContent = '🚫 Fake UTR detected — bank app లో actual UTR copy cheyyandi';
+        return { valid: false, reason: 'sequential' };
+      }
+
+      // 4. Format check
+      const is12digit = /^[0-9]{12}$/.test(v);
+      const isAlphanumeric = /^[A-Z0-9]{15,22}$/.test(v);
+      if (!is12digit && !isAlphanumeric) {
+        hint.className = 'utr-hint invalid';
+        hint.textContent = '✗ UTR: 12 digits (GPay/PhonePe) లేదా 15-22 chars (NEFT/IMPS) ఉండాలి';
+        return { valid: false, reason: 'format' };
+      }
+
+      // 5. Duplicate in session
+      if (_submittedUtrs.has(v)) {
+        hint.className = 'utr-hint invalid';
+        hint.textContent = '⚠️ ఈ UTR ఇప్పటికే submit అయింది — different order కి different UTR ఉంటుంది';
+        return { valid: false, reason: 'duplicate' };
+      }
+
+      hint.className = 'utr-hint valid';
+      hint.textContent = '✓ Valid UTR — confirm చేయండి';
+      return { valid: true, reason: 'ok' };
     }
 
     function confirmUpiPayment() {
       const txn = document.getElementById('upiTxnInput').value.trim();
-      if (!txn) { alert('Please enter your UTR / Transaction ID.'); return; }
-      const isValid = validateUtr(txn);
-      if (!isValid) {
-        const go = confirm('UTR format correct గా లేదు — still submit చేయాలా?\n(Correct UTR: 12 digits)');
-        if (!go) return;
+      if (!txn) {
+        alert('UTR / Transaction ID enter cheyyandi.\nBank app లో payment history లో UTR copy చేయండి.');
+        return;
       }
+
+      const result = validateUtr(txn);
+
+      if (!result.valid) {
+        if (result.reason === 'duplicate') {
+          alert('⚠️ ఈ UTR number ఇప్పటికే use అయింది!\nDifferent transaction కి different UTR number ఉంటుంది.');
+          return;
+        } else if (result.reason === 'blocked' || result.reason === 'sequential' || result.reason === 'repeated') {
+          alert('🚫 ఇది valid UTR కాదు.\n\nReal UTR ఎలా చూడాలి:\n• GPay: Payment → View details → UTR Number\n• PhonePe: History → Transaction → Reference ID\n• Paytm: Passbook → Transaction details → UTR\n• BHIM: Transaction History → Reference Number');
+          return;
+        } else {
+          const go = confirm('UTR format సరిగ్గా లేదు.\n\nReal UTR: 12 digits (GPay/PhonePe) లేదా 15-22 alphanumeric (NEFT).\n\nBank app లో check చేసి try చేయండి.\nContinue చేయాలంటే OK నొక్కండి.');
+          if (!go) return;
+        }
+      }
+
+      _submittedUtrs.add(txn.trim().toUpperCase());
       upiPaymentConfirmed = true;
       upiTxnId = txn;
       document.getElementById('upiPaidBadge').classList.add('show');
@@ -2517,10 +2568,23 @@
         return;
       }
 
-      // For UPI: if not confirmed, warn but allow (in case customer pays after)
+      // Payment validation — UPI lo order submit cheyyadaniki payment confirm ayyundi undali
       const payMethod = selectedPayMethod;
       const upiConfirmed = upiPaymentConfirmed;
       const txnRef = upiTxnId;
+
+      if (payMethod === 'UPI' && !upiConfirmed) {
+        const proceed = confirm(
+          'Payment Confirm కాలేదు!\n\n' +
+          'మీరు ఇంకా UTR / Transaction ID submit చేయలేదు.\n\n' +
+          'UPI payment చేసి UTR number enter చేయకుండా order place చేస్తే:\n' +
+          '  - Rs.50 UPI discount వర్తించదు\n' +
+          '  - Payment verify కాకుండా order dispatch కాదు\n\n' +
+          'Payment చేసి UTR submit చేయడానికి Cancel నొక్కండి.\n' +
+          'Anyway proceed చేయాలంటే OK నొక్కండి.'
+        );
+        if (!proceed) return;
+      }
 
       const unitPrice = currentItem.price || 0;
       const qty       = currentItem.qty   || 1;
@@ -2789,13 +2853,19 @@
       doc.setFontSize(7);
       doc.text(`${bizName.toUpperCase()}  ·  Mac Society, BHEL Township, Hyderabad 502032  ·  9666041369`, W / 2, H - 3, { align: 'center' });
 
-      /* ── DOWNLOAD PDF ── */
-      const pdfBlob = doc.output('blob');
-      const pdfUrl  = URL.createObjectURL(pdfBlob);
-      const dlLink  = document.createElement('a');
-      dlLink.href     = pdfUrl;
-      dlLink.download = `Invoice_${orderNo}.pdf`;
-      dlLink.click();
+      /* ── DOWNLOAD PDF — Only when payment is confirmed ── */
+      // COD: always generate invoice (payment at doorstep — confirmed)
+      // UPI: generate invoice only if UTR confirmed; otherwise skip (pending)
+      const shouldGenerateInvoice = (payMethod === 'COD') || (payMethod === 'UPI' && upiConfirmed);
+
+      if (shouldGenerateInvoice) {
+        const pdfBlob = doc.output('blob');
+        const pdfUrl  = URL.createObjectURL(pdfBlob);
+        const dlLink  = document.createElement('a');
+        dlLink.href     = pdfUrl;
+        dlLink.download = `Invoice_${orderNo}.pdf`;
+        dlLink.click();
+      }
 
       /* ── WHATSAPP ── */
       const payInfo = payMethod === 'COD'
@@ -2976,7 +3046,13 @@
             ? `⏳ UPI UTR submitted (${txnRef}) — మేము GPay లో verify చేసి 2-4 గంటల్లో confirm చేస్తాము. Confirm తర్వాతే dispatch!`
             : '📲 UPI Payment — UTR submit చేయలేదు, payment verify కాదు');
         const emailNote = custEmail ? `📧 Invoice email sent to ${custEmail}` : `📧 Email sent to Gaayathri Sarees`;
-        alert(`✅ Order Placed! — ${orderNo}\n\n📄 Invoice PDF downloaded\n📱 WhatsApp కి UTR పంపించాం\n${emailNote}\n\n📅 Estimated Delivery: ${deliveryDateStr}\n\n${payMsg}\n\nThank you for shopping with Gaayathri Sarees! 🌸`);
+        const invoiceNote = (payMethod === 'COD')
+          ? '📄 GST Invoice PDF downloaded ✅'
+          : (upiConfirmed
+            ? '📄 GST Invoice PDF downloaded ✅ (Payment Verified)'
+            : '⏳ GST Invoice: Payment confirm అయిన తర్వాత generate అవుతుంది');
+        const waNote = payMethod === 'UPI' ? '📱 WhatsApp కి UTR పంపించాం' : '📱 WhatsApp కి order details పంపించాం';
+        alert(`✅ Order Placed! — ${orderNo}\n\n${invoiceNote}\n${waNote}\n${emailNote}\n\n📅 Estimated Delivery: ${deliveryDateStr}\n\n${payMsg}\n\nThank you for shopping with Gaayathri Sarees! 🌸`);
       }, 500);
     }
     /* ── HELPER: fetch image as base64 ── */
