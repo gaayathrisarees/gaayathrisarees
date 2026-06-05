@@ -1742,8 +1742,12 @@
           </div>
 
           <div class="upi-paid-confirm">
-            <p>📸 Payment chesina tarvata, UTR / Transaction ID enter cheyyandi:</p>
-            <input id="upiTxnInput" type="text" placeholder="12-digit UTR number (e.g. 506241234567)" oninput="validateUtr(this.value)"/>
+            <p>📸 Payment chesina tarvata, UTR / Transaction ID :</p>
+            <div style="display:flex;gap:8px;align-items:stretch;margin-bottom:6px;">
+              <input id="upiTxnInput" type="text" placeholder="12-digit UTR (e.g. 506241234567)" oninput="validateUtr(this.value)" onfocus="autoDetectUtrFromClipboard()" style="flex:1;min-width:0;"/>
+              <button id="utrPasteBtn" onclick="pasteAndExtractUtr()" title="Clipboard నుండి UTR auto-fill చేయండి" style="background:rgba(212,175,55,.18);border:1px solid rgba(212,175,55,.5);color:var(--gold);font-family:var(--font);font-size:.7rem;letter-spacing:.1em;padding:0 13px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:background .2s;" onmouseover="this.style.background='rgba(212,175,55,.32)'" onmouseout="this.style.background='rgba(212,175,55,.18)'">📋 Paste</button>
+            </div>
+            <div id="utrClipHint" style="display:none;font-family:var(--font);font-size:.62rem;letter-spacing:.06em;color:rgba(212,175,55,.75);background:rgba(212,175,55,.08);border:1px solid rgba(212,175,55,.2);padding:5px 9px;border-radius:2px;margin-bottom:5px;cursor:pointer;" onclick="acceptClipboardUtr()"></div>
             <div id="utrHint" class="utr-hint"></div>
             <button id="upiConfirmBtn" onclick="confirmUpiPayment()">✅ Confirm Payment</button>
             <div id="upiPaidBadge">✅ UTR Submitted — Verification Pending (₹50 Discount Reserved!)</div>
@@ -2381,6 +2385,84 @@
       const total = sub + gst + delivery;
       const el = document.getElementById('codAmtDisplay');
       if (el) el.textContent = `Amount to pay: ₹${total.toLocaleString('en-IN')} (Cash at doorstep)`;
+    }
+
+    /* ── SMART UTR CLIPBOARD EXTRACTOR ── */
+
+    // UTR pattern: 12 digits (GPay/PhonePe) OR 15-22 alphanumeric uppercase (NEFT/IMPS)
+    function extractUtrFromText(text) {
+      if (!text) return null;
+      const t = text.trim();
+
+      // Priority 1: explicit label patterns (e.g. "UTR: 506241234567", "Ref No 403824...")
+      const labeled = t.match(/(?:UTR|UPI\s*Ref|Transaction\s*ID|Ref(?:erence)?(?:\s*No\.?)?|txn\s*id|order\s*id)[:\s#]*([A-Z0-9]{12,22})/i);
+      if (labeled) return labeled[1].toUpperCase();
+
+      // Priority 2: standalone 12-digit number
+      const twelve = t.match(/\b([0-9]{12})\b/);
+      if (twelve) return twelve[1];
+
+      // Priority 3: standalone 15-22 alphanumeric (all-caps or mixed)
+      const alphaNum = t.match(/\b([A-Z0-9]{15,22})\b/i);
+      if (alphaNum) return alphaNum[1].toUpperCase();
+
+      return null;
+    }
+
+    let _clipboardUtrCandidate = null;
+
+    async function pasteAndExtractUtr() {
+      try {
+        const text = await navigator.clipboard.readText();
+        const utr = extractUtrFromText(text);
+        const inp = document.getElementById('upiTxnInput');
+        const hint = document.getElementById('utrClipHint');
+
+        if (utr) {
+          inp.value = utr;
+          hint.style.display = 'none';
+          validateUtr(utr);
+        } else if (text.trim()) {
+          // pasted full message — no UTR found, fill raw and let user see
+          inp.value = text.trim().slice(0, 30);
+          validateUtr(inp.value);
+        } else {
+          alert('Clipboard empty — bank app లో UTR copy చేసి మళ్ళీ try చేయండి.');
+        }
+      } catch (e) {
+        // Fallback: open a small paste prompt
+        const pasted = prompt('Bank app message ఇక్కడ paste చేయండి — UTR automatically detect అవుతుంది:');
+        if (pasted) {
+          const utr = extractUtrFromText(pasted) || pasted.trim();
+          const inp = document.getElementById('upiTxnInput');
+          inp.value = utr;
+          validateUtr(utr);
+        }
+      }
+    }
+
+    async function autoDetectUtrFromClipboard() {
+      // On focus, silently check clipboard and suggest if UTR found
+      try {
+        const text = await navigator.clipboard.readText();
+        const utr = extractUtrFromText(text);
+        const hint = document.getElementById('utrClipHint');
+        const inp = document.getElementById('upiTxnInput');
+        if (utr && inp.value === '') {
+          _clipboardUtrCandidate = utr;
+          hint.textContent = `📋 Clipboard లో UTR కనిపించింది: ${utr} — tap చేసి fill చేయండి ✓`;
+          hint.style.display = 'block';
+        }
+      } catch (e) { /* permission denied — silently ignore */ }
+    }
+
+    function acceptClipboardUtr() {
+      if (!_clipboardUtrCandidate) return;
+      const inp = document.getElementById('upiTxnInput');
+      inp.value = _clipboardUtrCandidate;
+      document.getElementById('utrClipHint').style.display = 'none';
+      validateUtr(_clipboardUtrCandidate);
+      _clipboardUtrCandidate = null;
     }
 
     /* ── ANTI-FRAUD UTR VALIDATION ── */
