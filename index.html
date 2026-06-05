@@ -652,6 +652,11 @@
       /* Floating buttons — smaller */
       #floatingBtns { bottom: 20px; right: 16px; gap: 10px; }
       #floatingBtns a { width: 46px; height: 46px; }
+
+      /* Screenshot upload area — full width, comfortable tap target */
+      #utrScreenshotArea { padding: 20px 12px !important; }
+      #utrScreenshotImg  { max-height: 120px !important; }
+      #utrManualToggle span { font-size: .68rem !important; }
     }
 
     /* Extra small phones */
@@ -659,6 +664,9 @@
       .collections-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
       .hero h1 { font-size: 2rem; }
       .cat-tile { flex: 1 1 110px; max-width: 130px; }
+      /* Screenshot upload area — extra compact on very small screens */
+      #utrScreenshotArea { padding: 16px 10px !important; }
+      #utrScreenshotImg  { max-height: 100px !important; }
     }
 
     /* ═══════════════════════════════════════
@@ -1032,7 +1040,7 @@
       padding:14px 16px; margin-top:12px; border-radius:2px;
     }
     .upi-paid-confirm p { font-family:var(--font); font-size:.72rem; color:#6ddc82; letter-spacing:.08em; margin-bottom:8px; }
-    #upiTxnInput {
+    #upiTxnManual {
       width:100%; background:rgba(75,14,78,.2);
       border:1px solid rgba(212,175,55,.3); color:var(--cream);
       font-family:var(--font); font-size:.8rem;
@@ -2137,6 +2145,7 @@
       if (upiBtn) { upiBtn.disabled = false; upiBtn.textContent = '\u2705 Confirm Payment'; }
       const upiInput = document.getElementById('upiTxnInput');
       if (upiInput) upiInput.value = '';
+      resetScreenshotArea();
       updateCodAmtDisplay();
         }, 380);
 
@@ -2428,25 +2437,74 @@
       document.getElementById('upiConfirmBtn').style.display = '';
     }
 
+    // Track screenshot lock state
+    let _screenshotLocked = false;
+    let _screenshotB64    = null;   // kept to attach to WhatsApp/email as proof
+
+    function lockScreenshotArea() {
+      _screenshotLocked = true;
+      const area = document.getElementById('utrScreenshotArea');
+      // Remove click handler & dim it
+      area.onclick = null;
+      area.style.cursor   = 'default';
+      area.style.opacity  = '0.6';
+      area.style.border   = '2px solid rgba(39,174,96,.5)';
+      document.getElementById('utrManualToggle').style.display = 'none';
+      document.getElementById('utrManualSection').style.display = 'none';
+    }
+
+    function resetScreenshotArea() {
+      _screenshotLocked = false;
+      _screenshotB64    = null;
+      const area = document.getElementById('utrScreenshotArea');
+      area.onclick       = () => document.getElementById('utrScreenshotFile').click();
+      area.style.cursor  = 'pointer';
+      area.style.opacity = '1';
+      area.style.border  = '2px dashed rgba(212,175,55,.45)';
+      document.getElementById('utrScreenshotPreview').style.display = 'none';
+      document.getElementById('utrUploadPrompt').style.display      = 'block';
+      document.getElementById('utrScanStatus').style.display        = 'none';
+      document.getElementById('utrManualToggle').style.display      = 'block';
+      document.getElementById('utrScanSpinner').style.display       = 'inline-block';
+      document.getElementById('utrScreenshotFile').value            = '';
+    }
+
     async function handleUtrScreenshot(input) {
+      if (_screenshotLocked) return;
       const file = input.files[0];
       if (!file) return;
 
-      // Show preview
+      // Image type guard
+      if (!file.type.startsWith('image/')) {
+        alert('Please upload an image file (jpg/png/webp).');
+        return;
+      }
+
+      // Fix 2: Reset preview & hint before processing new upload
+      document.getElementById('utrScreenshotPreview').style.display = 'none';
+      document.getElementById('utrUploadPrompt').style.display      = 'block';
+      document.getElementById('utrScanSpinner').style.display       = 'inline-block';
+      document.getElementById('utrScanStatus').style.display        = 'none';
+      const hint = document.getElementById('utrHint');
+      hint.className = 'utr-hint'; hint.textContent = '';
+      _screenshotB64 = null;
+
       const reader = new FileReader();
       reader.onload = async (e) => {
-        const b64 = e.target.result.split(',')[1];
+        const b64  = e.target.result.split(',')[1];
         const mime = file.type || 'image/jpeg';
+        _screenshotB64 = b64;   // store for order proof
 
-        // Show preview image
-        document.getElementById('utrScreenshotImg').src = e.target.result;
+        // Show preview
+        document.getElementById('utrScreenshotImg').src             = e.target.result;
         document.getElementById('utrScreenshotPreview').style.display = 'block';
-        document.getElementById('utrUploadPrompt').style.display = 'none';
+        document.getElementById('utrUploadPrompt').style.display     = 'none';
 
-        // Show scanning status
+        // Scanning status
         const status = document.getElementById('utrScanStatus');
         status.style.display = 'block';
-        document.getElementById('utrScanMsg').textContent = ' Reading your screenshot...';
+        document.getElementById('utrScanSpinner').style.display = 'inline-block';
+        document.getElementById('utrScanMsg').textContent       = ' Verifying payment screenshot...';
 
         try {
           const resp = await fetch('https://api.anthropic.com/v1/messages', {
@@ -2454,43 +2512,100 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               model: 'claude-sonnet-4-20250514',
-              max_tokens: 200,
+              max_tokens: 300,
               messages: [{
                 role: 'user',
                 content: [
-                  {
-                    type: 'image',
-                    source: { type: 'base64', media_type: mime, data: b64 }
-                  },
-                  {
-                    type: 'text',
-                    text: 'This is a UPI payment screenshot (GPay, PhonePe, Paytm, BHIM etc). Extract ONLY the UTR number or Transaction Reference ID or Reference Number from it. UTR is typically 12 digits (GPay/PhonePe) or 15-22 alphanumeric characters (NEFT/IMPS). Reply with ONLY the UTR number, nothing else. If not found, reply: NOT_FOUND'
-                  }
+                  { type: 'image', source: { type: 'base64', media_type: mime, data: b64 } },
+                  { type: 'text', text: `You are a payment fraud detection system for an Indian saree shop.
+
+Analyze this image carefully and respond with ONLY a JSON object in this exact format:
+{"is_real_payment": true/false, "utr": "UTR_NUMBER_OR_EMPTY", "amount": "AMOUNT_OR_EMPTY", "app": "gpay/phonepe/paytm/bhim/other/unknown", "reason": "one short sentence"}
+
+Rules:
+- is_real_payment = true ONLY if this is a genuine UPI payment success screenshot from GPay, PhonePe, Paytm, BHIM, or any real banking app showing a completed/successful transaction
+- is_real_payment = false if: it looks edited/photoshopped, it is a pending transaction, it is a request for money (not payment), it is a bank balance screenshot, it is not a payment screenshot at all, the "Paid" or "Success" text looks fake or unusual, colors or fonts look off
+- utr = the UTR/reference/transaction ID number (12 digits for GPay/PhonePe, 15-22 chars for NEFT). Leave empty string if not visible
+- amount = the rupee amount paid, digits only, no symbols
+- reason = brief reason for your decision
+
+Respond with JSON only, no other text.` }
                 ]
               }]
             })
           });
 
           const data = await resp.json();
-          const raw = (data.content?.[0]?.text || '').trim();
+          const raw  = (data.content?.[0]?.text || '').trim();
 
-          if (raw === 'NOT_FOUND' || !raw) {
-            document.getElementById('utrScanMsg').textContent = ' UTR not found — please enter manually';
-            document.getElementById('utrScanSpinner').style.display = 'none';
-            toggleManualUtr();
-          } else {
-            // Extract clean UTR from response (in case model adds extra text)
-            const utr = extractUtrFromText(raw) || raw.replace(/[^A-Z0-9]/gi,'').toUpperCase();
+          let parsed;
+          try {
+            parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+          } catch {
+            throw new Error('Invalid AI response');
+          }
+
+          document.getElementById('utrScanSpinner').style.display = 'none';
+
+          if (!parsed.is_real_payment) {
+            // FRAUD / invalid screenshot
             document.getElementById('utrScanStatus').style.display = 'none';
-            setUtrValue(utr);
-            // Show success in hint
+            document.getElementById('utrScreenshotPreview').style.display = 'none';
+            document.getElementById('utrUploadPrompt').style.display = 'block';
+            document.getElementById('utrScreenshotFile').value = '';
+            _screenshotB64 = null;
             const hint = document.getElementById('utrHint');
-            hint.className = 'utr-hint valid';
-            hint.textContent = `✓ UTR detected from screenshot: ${utr} — click Confirm to proceed`;
+            hint.className   = 'utr-hint invalid';
+            hint.textContent = `🚫 Invalid screenshot — ${parsed.reason || 'please upload a real payment success screenshot'}`;
+            return;
+          }
+
+          // Real payment confirmed by AI
+          document.getElementById('utrScanStatus').style.display = 'none';
+          // Fix 4: hide "Enter manually" link on success
+          document.getElementById('utrManualToggle').style.display = 'none';
+          document.getElementById('utrManualSection').style.display = 'none';
+          const hint = document.getElementById('utrHint');
+
+          if (parsed.utr) {
+            const utr = parsed.utr.toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+            // Screenshot reuse fraud check — hash the b64 to detect same image resubmission
+            const hashKey = 'gsUsedScreenshots';
+            let usedHashes = JSON.parse(sessionStorage.getItem(hashKey) || '[]');
+            // Simple fast hash: length + first 200 chars + last 200 chars
+            const imgHash = b64.length + '|' + b64.slice(0, 200) + '|' + b64.slice(-200);
+            if (usedHashes.includes(imgHash)) {
+              hint.className   = 'utr-hint invalid';
+              hint.textContent = '🚫 This screenshot has already been used for another order. Each order needs a unique payment screenshot.';
+              document.getElementById('utrScreenshotPreview').style.display = 'none';
+              document.getElementById('utrUploadPrompt').style.display = 'block';
+              document.getElementById('utrScreenshotFile').value = '';
+              _screenshotB64 = null;
+              return;
+            }
+            // Register this screenshot hash for the session
+            usedHashes.push(imgHash);
+            sessionStorage.setItem(hashKey, JSON.stringify(usedHashes));
+
+            setUtrValue(utr);
+            hint.className   = 'utr-hint valid';
+            hint.textContent = `✓ Payment verified — UTR: ${utr}${parsed.amount ? '  |  ₹' + parsed.amount : ''} — confirming...`;
+
+            // Fix 5: auto-confirm after 1.2s so user doesn't need to tap
+            setTimeout(() => {
+              const btn = document.getElementById('upiConfirmBtn');
+              if (btn && !btn.disabled) btn.click();
+            }, 1200);
+          } else {
+            // Real screenshot but UTR not visible — ask manual entry
+            hint.className   = 'utr-hint invalid';
+            hint.textContent = '⚠️ Payment screenshot looks real but UTR number not visible — enter it manually below';
+            toggleManualUtr();
           }
 
         } catch (err) {
-          document.getElementById('utrScanMsg').textContent = ' Error reading screenshot — please enter manually';
+          document.getElementById('utrScanMsg').textContent = ' Error — please try again or enter manually';
           document.getElementById('utrScanSpinner').style.display = 'none';
           toggleManualUtr();
         }
@@ -2648,6 +2763,7 @@
       document.getElementById('upiConfirmBtn').disabled = true;
       document.getElementById('upiConfirmBtn').textContent = '⏳ Submitted — Pending Verification';
       document.getElementById('upiConfirmBtn').style.background = '#e67e22';
+      lockScreenshotArea();   // 🔒 prevent re-upload after confirm
     }
 
     /* ── UPI APP DEEP LINK ── */
@@ -3208,10 +3324,22 @@
           };
 
           const payTag = payMethod === 'COD' ? '[COD]' : (upiConfirmed ? '[UPI-VERIFY] UTR:' + txnRef : '[UPI-PENDING]');
+
+          // Build admin email — append screenshot proof for UPI orders
+          let adminHtml = buildInvoiceHTML(false);
+          if (payMethod === 'UPI' && _screenshotB64) {
+            const mime = document.getElementById('utrScreenshotFile').files[0]?.type || 'image/jpeg';
+            adminHtml += `<div style="margin-top:20px;padding:16px;background:#1a0520;border:2px solid #D4AF37;font-family:sans-serif;">` +
+              `<p style="color:#D4AF37;font-weight:bold;margin:0 0 10px;">📸 Payment Screenshot (AI Verified)</p>` +
+              `<img src="data:${mime};base64,${_screenshotB64}" style="max-width:320px;width:100%;border:1px solid #D4AF37;" alt="Payment Screenshot"/>` +
+              `<p style="color:rgba(253,246,227,0.6);font-size:11px;margin:8px 0 0;">UTR: ${txnRef} — Screenshot submitted by customer at order time.</p>` +
+              `</div>`;
+          }
+
           await sendEmail(
             'gaayathrisarees@gmail.com',
             `🛍️ ${payTag} New Order ${orderNo}: ${currentItem.name} — ${name}`,
-            buildInvoiceHTML(false)
+            adminHtml
           );
 
           if (custEmail) {
@@ -3231,6 +3359,7 @@
       selectedPayMethod = 'COD';
       upiPaymentConfirmed = false;
       upiTxnId = '';
+      resetScreenshotArea();
       setTimeout(() => {
         const payMsg = payMethod === 'COD'
           ? '💵 Payment: Cash on Delivery — pay at doorstep'
