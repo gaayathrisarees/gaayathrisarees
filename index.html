@@ -894,9 +894,101 @@
     }
     .reveal.visible { opacity:1; transform:none; }
   
-    /* ══════════════════════════════
-       ADMIN PANEL STYLES
-    ══════════════════════════════ */
+    /* ── REFUND / REPLACEMENT SECTION ── */
+    #refundSection { background: linear-gradient(160deg,#1a0230 0%,#0d0115 100%); }
+    .refund-grid {
+      max-width: 960px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px; margin-bottom: 40px;
+    }
+    .refund-card {
+      background: linear-gradient(145deg,#2a0535,#1a0320);
+      border: 1px solid rgba(212,175,55,.22);
+      padding: 28px 24px; text-align: center;
+      transition: transform .3s, box-shadow .3s;
+    }
+    .refund-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(212,175,55,.14); }
+    .refund-icon { font-size: 2.2rem; margin-bottom: 14px; }
+    .refund-card h3 {
+      font-family: var(--font); color: var(--gold); font-size: .82rem;
+      letter-spacing: .18em; text-transform: uppercase; margin-bottom: 10px;
+    }
+    .refund-card p {
+      font-family: var(--font); color: rgba(253,246,227,.6);
+      font-size: .75rem; letter-spacing: .06em; line-height: 1.8;
+    }
+    .refund-window-badge {
+      display: inline-block;
+      background: rgba(212,175,55,.15); border: 1px solid var(--gold);
+      color: var(--gold); font-family: var(--font); font-size: .65rem;
+      letter-spacing: .22em; text-transform: uppercase; padding: 5px 14px;
+      margin-top: 12px;
+    }
+    .refund-steps {
+      max-width: 720px; margin: 0 auto 40px;
+      background: linear-gradient(145deg,#2a0535,#1a0320);
+      border: 1px solid rgba(212,175,55,.22); padding: 28px 30px;
+    }
+    .refund-steps h3 {
+      font-family: var(--font); color: var(--gold);
+      font-size: .78rem; letter-spacing: .22em; text-transform: uppercase; margin-bottom: 18px;
+    }
+    .refund-step {
+      display: flex; gap: 16px; align-items: flex-start;
+      padding: 12px 0; border-bottom: 1px solid rgba(212,175,55,.1);
+    }
+    .refund-step:last-child { border-bottom: none; }
+    .refund-step-num {
+      width: 28px; height: 28px; background: var(--gold); color: var(--royal);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-family: var(--font); font-size: .72rem; font-weight: 700; flex-shrink: 0;
+    }
+    .refund-step p { font-family: var(--font); font-size: .75rem; color: rgba(253,246,227,.7); letter-spacing: .06em; line-height: 1.7; }
+    .refund-step strong { color: var(--cream); }
+    .refund-note {
+      max-width: 720px; margin: 0 auto;
+      background: rgba(230,126,34,.08); border: 1px solid rgba(230,126,34,.3);
+      padding: 16px 22px; text-align: center;
+    }
+    .refund-note p { font-family: var(--font); font-size: .72rem; color: rgba(253,246,227,.7); letter-spacing: .08em; line-height: 1.8; }
+
+    /* ── REFUND PAYMENT METHOD POPUP ── */
+    #refundModal {
+      display: none; position: fixed; inset: 0; z-index: 3000;
+      background: rgba(0,0,0,.82); backdrop-filter: blur(6px);
+      align-items: center; justify-content: center;
+    }
+    #refundModal.open { display: flex; }
+    .refund-modal-box {
+      background: linear-gradient(145deg,#2a0535,#1a0320);
+      border: 2px solid var(--gold); max-width: 520px; width: 92%;
+      padding: 36px 32px; position: relative;
+      box-shadow: 0 24px 80px rgba(0,0,0,.9);
+    }
+    .refund-method-btn {
+      width: 100%; padding: 14px 18px; margin-bottom: 12px;
+      background: rgba(75,14,78,.3); border: 1px solid rgba(212,175,55,.35);
+      color: var(--cream); font-family: var(--font); font-size: .78rem;
+      letter-spacing: .1em; cursor: pointer; text-align: left;
+      transition: background .25s, border-color .25s;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .refund-method-btn:hover { background: rgba(212,175,55,.14); border-color: var(--gold); }
+    .refund-method-btn.selected { background: rgba(212,175,55,.18); border-color: var(--gold); color: var(--gold); }
+    .refund-bank-form { display: none; margin-top: 8px; }
+    .refund-bank-form.show { display: block; }
+    .refund-bank-input {
+      width: 100%; background: rgba(75,14,78,.2);
+      border: 1px solid rgba(212,175,55,.3); color: var(--cream);
+      font-family: var(--font); font-size: .8rem; padding: 10px 12px;
+      outline: none; margin-bottom: 10px;
+    }
+    .refund-bank-input:focus { border-color: var(--gold); }
+    @media(max-width:768px) {
+      .refund-grid { grid-template-columns: 1fr; gap: 14px; }
+      .refund-steps { padding: 20px 18px; }
+      .refund-modal-box { padding: 24px 18px; }
+    }
     #adminLoginOverlay {
       display:none; position:fixed; inset:0; z-index:9000;
       background:rgba(0,0,0,.85); backdrop-filter:blur(8px);
@@ -1446,8 +1538,128 @@
   </section>
 
   <!-- ══════════════════════════════════
-       FOOTER
+       REFUND & REPLACEMENT POLICY
   ══════════════════════════════════ -->
+  <section id="refundSection">
+    <p class="section-eyebrow reveal">Customer Promise</p>
+    <h2 class="section-title reveal">Refund &amp; <span>Replacement</span></h2>
+    <div class="divider"></div>
+
+    <div class="refund-grid">
+      <div class="refund-card reveal">
+        <div class="refund-icon">🔄</div>
+        <h3>Free Replacement</h3>
+        <p>Damaged item, wrong item, or defective fabric? We send a free replacement — no questions asked.</p>
+        <span class="refund-window-badge">Within 3 Days</span>
+      </div>
+      <div class="refund-card reveal" style="transition-delay:.1s">
+        <div class="refund-icon">💸</div>
+        <h3>Full Refund</h3>
+        <p>Prefer a refund instead? We process a full refund to your original payment method within 3–5 business days.</p>
+        <span class="refund-window-badge">Within 3 Days</span>
+      </div>
+      <div class="refund-card reveal" style="transition-delay:.2s">
+        <div class="refund-icon">📸</div>
+        <h3>Easy Process</h3>
+        <p>Just WhatsApp us a photo of the issue within 3 days of delivery. We handle everything from there.</p>
+        <span class="refund-window-badge">WhatsApp Us</span>
+      </div>
+    </div>
+
+    <div class="refund-steps reveal">
+      <h3>How to Request a Refund or Replacement</h3>
+      <div class="refund-step">
+        <div class="refund-step-num">1</div>
+        <p><strong>Contact within 3 days</strong> of delivery — WhatsApp us at <strong>+91 9666041369</strong> with your order number and issue.</p>
+      </div>
+      <div class="refund-step">
+        <div class="refund-step-num">2</div>
+        <p><strong>Send photos</strong> of the item showing the damage, defect, or wrong item received.</p>
+      </div>
+      <div class="refund-step">
+        <div class="refund-step-num">3</div>
+        <p><strong>Choose your option</strong> — Replacement (new item dispatched free) or Refund (money returned). Click the button below to select your refund method.</p>
+      </div>
+      <div class="refund-step">
+        <div class="refund-step-num">4</div>
+        <p><strong>Replacement</strong> dispatched within 1–2 days, or <strong>Refund</strong> credited within 3–5 business days to your chosen account.</p>
+      </div>
+      <div style="margin-top:20px;text-align:center;">
+        <button class="btn-primary" onclick="openRefundModal()" style="font-size:.75rem;padding:12px 28px;">
+          💸 Request Refund / Replacement →
+        </button>
+      </div>
+    </div>
+
+    <div class="refund-note reveal">
+      <p>⚠️ <strong>Note:</strong> Refund &amp; Replacement requests must be raised within <strong>3 days</strong> of delivery. Items must be unused and in original condition for refund eligibility. Damaged-in-transit items are fully covered regardless of condition.</p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════
+       REFUND PAYMENT METHOD MODAL
+  ══════════════════════════════════ -->
+  <div id="refundModal">
+    <div class="refund-modal-box">
+      <button onclick="closeRefundModal()" style="position:absolute;top:14px;right:18px;background:transparent;border:none;color:var(--gold);font-size:1.3rem;cursor:pointer;">✕</button>
+      <p style="font-family:var(--font);font-size:.62rem;letter-spacing:.38em;color:var(--gold);text-transform:uppercase;margin-bottom:6px;text-align:center;">Refund Request</p>
+      <h3 style="font-family:var(--font);color:var(--cream);font-size:1.1rem;letter-spacing:.1em;margin-bottom:4px;text-align:center;">Choose Refund Method</h3>
+      <div style="width:50px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 22px;"></div>
+
+      <p style="font-family:var(--font);font-size:.7rem;color:rgba(253,246,227,.5);letter-spacing:.08em;margin-bottom:16px;text-align:center;">How would you like your refund?</p>
+
+      <!-- Option 1: Replacement -->
+      <button class="refund-method-btn" id="rOptReplace" onclick="selectRefundOption('replace')">
+        <span style="font-size:1.3rem;">🔄</span>
+        <span><strong>Free Replacement</strong> — New item dispatched within 1–2 days</span>
+      </button>
+
+      <!-- Option 2: UPI Refund -->
+      <button class="refund-method-btn" id="rOptUpi" onclick="selectRefundOption('upi')">
+        <span style="font-size:1.3rem;">📲</span>
+        <span><strong>UPI Refund</strong> — Money returned to your UPI ID</span>
+      </button>
+
+      <!-- Option 3: Bank Transfer -->
+      <button class="refund-method-btn" id="rOptBank" onclick="selectRefundOption('bank')">
+        <span style="font-size:1.3rem;">🏦</span>
+        <span><strong>Bank Transfer</strong> — Direct NEFT to your account</span>
+      </button>
+
+      <!-- UPI details form -->
+      <div id="refundUpiForm" class="refund-bank-form">
+        <label style="font-family:var(--font);font-size:.62rem;letter-spacing:.18em;color:rgba(212,175,55,.8);text-transform:uppercase;display:block;margin-bottom:5px;">Your UPI ID</label>
+        <input id="refundUpiId" class="refund-bank-input" type="text" placeholder="yourname@upi or +91XXXXXXXXXX@bank"/>
+        <label style="font-family:var(--font);font-size:.62rem;letter-spacing:.18em;color:rgba(212,175,55,.8);text-transform:uppercase;display:block;margin-bottom:5px;">Your Name</label>
+        <input id="refundUpiName" class="refund-bank-input" type="text" placeholder="Account holder name"/>
+      </div>
+
+      <!-- Bank details form -->
+      <div id="refundBankForm" class="refund-bank-form">
+        <label style="font-family:var(--font);font-size:.62rem;letter-spacing:.18em;color:rgba(212,175,55,.8);text-transform:uppercase;display:block;margin-bottom:5px;">Account Number</label>
+        <input id="refundAccNo" class="refund-bank-input" type="text" placeholder="Bank account number"/>
+        <label style="font-family:var(--font);font-size:.62rem;letter-spacing:.18em;color:rgba(212,175,55,.8);text-transform:uppercase;display:block;margin-bottom:5px;">IFSC Code</label>
+        <input id="refundIfsc" class="refund-bank-input" type="text" placeholder="e.g. SBIN0001234"/>
+        <label style="font-family:var(--font);font-size:.62rem;letter-spacing:.18em;color:rgba(212,175,55,.8);text-transform:uppercase;display:block;margin-bottom:5px;">Account Holder Name</label>
+        <input id="refundAccName" class="refund-bank-input" type="text" placeholder="Name as on account"/>
+      </div>
+
+      <!-- Order number -->
+      <div style="margin-top:14px;">
+        <label style="font-family:var(--font);font-size:.62rem;letter-spacing:.18em;color:rgba(212,175,55,.8);text-transform:uppercase;display:block;margin-bottom:5px;">Your Order Number</label>
+        <input id="refundOrderNo" class="refund-bank-input" type="text" placeholder="GS-XXXXXXXX"/>
+      </div>
+      <div style="margin-top:10px;">
+        <label style="font-family:var(--font);font-size:.62rem;letter-spacing:.18em;color:rgba(212,175,55,.8);text-transform:uppercase;display:block;margin-bottom:5px;">Reason</label>
+        <textarea id="refundReason" class="refund-bank-input" style="min-height:56px;resize:vertical;" placeholder="Describe the issue briefly (damaged, wrong item, etc.)"></textarea>
+      </div>
+
+      <button onclick="submitRefundRequest()" style="width:100%;margin-top:18px;background:var(--gold);border:none;color:var(--royal);font-family:var(--font);font-weight:700;font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;padding:14px;cursor:pointer;transition:background .3s;" onmouseover="this.style.background='#F0D060'" onmouseout="this.style.background='var(--gold)'">
+        Submit Request via WhatsApp →
+      </button>
+      <p style="text-align:center;font-family:var(--font);font-size:.63rem;color:rgba(253,246,227,.35);letter-spacing:.08em;margin-top:10px;">Your request will be sent to our WhatsApp instantly.</p>
+    </div>
+  </div>
   <footer>
     <div class="footer-grid">
       <div class="footer-brand">
@@ -1480,6 +1692,7 @@
           <li><a href="#collections">Collections</a></li>
           <li><a href="#categories">Categories</a></li>
           <li><a href="#why">About Us</a></li>
+          <li><a href="#refundSection">Refund &amp; Replacement</a></li>
           <li><a href="#contact">Contact</a></li>
         </ul>
       </div>
@@ -1523,7 +1736,8 @@
     </div>
   </div>
 
-  <!-- Saved floating button removed -->
+  <!-- Saved floating badge (hidden, badge count only) -->
+  <span id="savedBadge" style="display:none;position:fixed;top:118px;right:0;background:#ff6b9d;color:white;font-size:.58rem;font-weight:700;min-width:20px;height:20px;border-radius:10px 0 0 10px;align-items:center;justify-content:center;font-family:sans-serif;padding:0 6px;z-index:1301;box-shadow:0 0 8px rgba(255,107,157,.5);"></span>
 
   <!-- ══════════════════════════════════
        SAVED ITEMS PANEL
@@ -1769,7 +1983,7 @@
             <div id="utrManualSection" style="display:none;">
               <div style="display:flex;gap:8px;align-items:stretch;margin-bottom:6px;">
                 <input id="upiTxnManual" type="text" placeholder="12-digit UTR (e.g. 506241234567)" oninput="validateUtr(this.value);document.getElementById('upiTxnInput').value=this.value;" onfocus="autoDetectUtrFromClipboard()" style="flex:1;min-width:0;"/>
-                <button onclick="pasteAndExtractUtr()" style="background:rgba(212,175,55,.18);border:1px solid rgba(212,175,55,.5);color:var(--gold);font-family:var(--font);font-size:.7rem;letter-spacing:.1em;padding:0 13px;cursor:pointer;white-space:nowrap;flex-shrink:0;">📋 Paste</button>
+                <button id="utrPasteBtn" onclick="pasteAndExtractUtr()" style="background:rgba(212,175,55,.18);border:1px solid rgba(212,175,55,.5);color:var(--gold);font-family:var(--font);font-size:.7rem;letter-spacing:.1em;padding:0 13px;cursor:pointer;white-space:nowrap;flex-shrink:0;">📋 Paste</button>
               </div>
               <div id="utrClipHint" style="display:none;font-family:var(--font);font-size:.62rem;letter-spacing:.06em;color:rgba(212,175,55,.75);background:rgba(212,175,55,.08);border:1px solid rgba(212,175,55,.2);padding:5px 9px;border-radius:2px;margin-bottom:5px;cursor:pointer;" onclick="acceptClipboardUtr()"></div>
             </div>
@@ -1802,6 +2016,50 @@
   ══════════════════════════════════ -->
   <script>
     /* ── VIDEO PRELOADER ── */
+    // ══════════════════════════════════════════════════════════════════
+    // CLOUDFLARE WORKER PROXY — API key browser కి కనపడదు, safe గా ఉంటుంది
+    // SETUP (10 minutes, FREE):
+    // 1. https://workers.cloudflare.com → Sign up (free)
+    // 2. Workers → Create a Worker → paste this Worker code:
+    //
+    //   export default {
+    //     async fetch(request, env) {
+    //       if (request.method === 'OPTIONS') return new Response(null, {
+    //         headers: { 'Access-Control-Allow-Origin': '*',
+    //                    'Access-Control-Allow-Headers': 'Content-Type' }
+    //       });
+    //       const body = await request.text();
+    //       const resp = await fetch('https://api.anthropic.com/v1/messages', {
+    //         method: 'POST',
+    //         headers: { 'Content-Type': 'application/json',
+    //                    'x-api-key': env.ANTHROPIC_KEY,
+    //                    'anthropic-version': '2023-06-01' },
+    //         body
+    //       });
+    //       return new Response(await resp.text(), {
+    //         headers: { 'Content-Type': 'application/json',
+    //                    'Access-Control-Allow-Origin': '*' }
+    //       });
+    //     }
+    //   }
+    //
+    // 3. Settings → Variables → Add: Name=ANTHROPIC_KEY, Value=(your API key)
+    // 4. Deploy → Copy your worker URL (https://gs-proxy.yourname.workers.dev)
+    // 5. Paste it below as WORKER_URL ↓
+    // ══════════════════════════════════════════════════════════════════
+    const WORKER_URL = 'https://gs-proxy.yourname.workers.dev'; // ← Your worker URL idde
+
+    async function callAnthropicViaWorker(requestBody) {
+      const url = (WORKER_URL && !WORKER_URL.includes('yourname'))
+        ? WORKER_URL
+        : 'https://api.anthropic.com/v1/messages';
+      const headers = { 'Content-Type': 'application/json' };
+      if (url.includes('api.anthropic.com')) {
+        headers['anthropic-version'] = '2023-06-01';
+      }
+      const resp = await fetch(url, { method: 'POST', headers, body: JSON.stringify(requestBody) });
+      return resp.json();
+    }
     (function () {
       const pre   = document.getElementById('preloader');
       const video = document.getElementById('introVideo');
@@ -2507,43 +2765,22 @@
         document.getElementById('utrScanMsg').textContent       = ' Verifying payment screenshot...';
 
         try {
-          const resp = await fetch('https://api.anthropic.com/v1/messages', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              model: 'claude-sonnet-4-20250514',
-              max_tokens: 300,
-              messages: [{
-                role: 'user',
-                content: [
-                  { type: 'image', source: { type: 'base64', media_type: mime, data: b64 } },
-                  { type: 'text', text: `You are a payment fraud detection system for an Indian saree shop.
-
-Analyze this image carefully and respond with ONLY a JSON object in this exact format:
-{"is_real_payment": true/false, "utr": "UTR_NUMBER_OR_EMPTY", "amount": "AMOUNT_OR_EMPTY", "app": "gpay/phonepe/paytm/bhim/other/unknown", "reason": "one short sentence"}
-
-Rules:
-- is_real_payment = true ONLY if this is a genuine UPI payment success screenshot from GPay, PhonePe, Paytm, BHIM, or any real banking app showing a completed/successful transaction
-- is_real_payment = false if: it looks edited/photoshopped, it is a pending transaction, it is a request for money (not payment), it is a bank balance screenshot, it is not a payment screenshot at all, the "Paid" or "Success" text looks fake or unusual, colors or fonts look off
-- utr = the UTR/reference/transaction ID number (12 digits for GPay/PhonePe, 15-22 chars for NEFT). Leave empty string if not visible
-- amount = the rupee amount paid, digits only, no symbols
-- reason = brief reason for your decision
-
-Respond with JSON only, no other text.` }
-                ]
-              }]
-            })
+          const data = await callAnthropicViaWorker({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 300,
+            messages: [{
+              role: 'user',
+              content: [
+                { type: 'image', source: { type: 'base64', media_type: mime, data: b64 } },
+                { type: 'text', text: `You are a payment fraud detection system for an Indian saree shop.\n\nAnalyze this image carefully and respond with ONLY a JSON object in this exact format:\n{"is_real_payment": true/false, "utr": "UTR_NUMBER_OR_EMPTY", "amount": "AMOUNT_OR_EMPTY", "app": "gpay/phonepe/paytm/bhim/other/unknown", "reason": "one short sentence"}\n\nRules:\n- is_real_payment = true ONLY if this is a genuine UPI payment success screenshot from GPay, PhonePe, Paytm, BHIM, or any real banking app showing a completed/successful transaction\n- is_real_payment = false if: it looks edited/photoshopped, it is a pending transaction, it is a request for money (not payment), it is a bank balance screenshot, it is not a payment screenshot at all, the "Paid" or "Success" text looks fake or unusual, colors or fonts look off\n- utr = the UTR/reference/transaction ID number (12 digits for GPay/PhonePe, 15-22 chars for NEFT). Leave empty string if not visible\n- amount = the rupee amount paid, digits only, no symbols\n- reason = brief reason for your decision\n\nRespond with JSON only, no other text.` }
+              ]
+            }]
           });
-
-          const data = await resp.json();
           const raw  = (data.content?.[0]?.text || '').trim();
 
           let parsed;
-          try {
-            parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
-          } catch {
-            throw new Error('Invalid AI response');
-          }
+          try { parsed = JSON.parse(raw.replace(/```json|```/g, '').trim()); }
+          catch { throw new Error('Invalid AI response'); }
 
           document.getElementById('utrScanSpinner').style.display = 'none';
 
@@ -3390,7 +3627,62 @@ Respond with JSON only, no other text.` }
       } catch(e) { return null; }
     }
 
-    /* ── WHATSAPP ENQUIRY (contact form) ── */
+    /* ══════════════════════════════════════
+       REFUND / REPLACEMENT MODAL
+    ══════════════════════════════════════ */
+    let _refundOption = '';
+
+    function openRefundModal() {
+      _refundOption = '';
+      document.getElementById('refundModal').classList.add('open');
+      ['rOptReplace','rOptUpi','rOptBank'].forEach(id => document.getElementById(id).classList.remove('selected'));
+      document.getElementById('refundUpiForm').classList.remove('show');
+      document.getElementById('refundBankForm').classList.remove('show');
+    }
+
+    function closeRefundModal() {
+      document.getElementById('refundModal').classList.remove('open');
+    }
+
+    function selectRefundOption(opt) {
+      _refundOption = opt;
+      document.getElementById('rOptReplace').classList.toggle('selected', opt === 'replace');
+      document.getElementById('rOptUpi').classList.toggle('selected', opt === 'upi');
+      document.getElementById('rOptBank').classList.toggle('selected', opt === 'bank');
+      document.getElementById('refundUpiForm').classList.toggle('show', opt === 'upi');
+      document.getElementById('refundBankForm').classList.toggle('show', opt === 'bank');
+    }
+
+    function submitRefundRequest() {
+      if (!_refundOption) { alert('Please select a refund method first.'); return; }
+      const orderNo = document.getElementById('refundOrderNo').value.trim();
+      const reason  = document.getElementById('refundReason').value.trim();
+      if (!orderNo) { alert('Please enter your order number.'); return; }
+
+      let methodDetail = '';
+      if (_refundOption === 'replace') {
+        methodDetail = '🔄 *Option: FREE REPLACEMENT*';
+      } else if (_refundOption === 'upi') {
+        const upiId   = document.getElementById('refundUpiId').value.trim();
+        const upiName = document.getElementById('refundUpiName').value.trim();
+        if (!upiId) { alert('Please enter your UPI ID for the refund.'); return; }
+        methodDetail = `📲 *Option: UPI REFUND*\nUPI ID: ${upiId}\nName: ${upiName}`;
+      } else if (_refundOption === 'bank') {
+        const accNo   = document.getElementById('refundAccNo').value.trim();
+        const ifsc    = document.getElementById('refundIfsc').value.trim();
+        const accName = document.getElementById('refundAccName').value.trim();
+        if (!accNo || !ifsc) { alert('Please enter account number and IFSC code.'); return; }
+        methodDetail = `🏦 *Option: BANK TRANSFER*\nAccount No: ${accNo}\nIFSC: ${ifsc}\nName: ${accName}`;
+      }
+
+      const msg = `🔄 *REFUND / REPLACEMENT REQUEST*\n\nOrder No: ${orderNo}\nReason: ${reason || 'Not specified'}\n\n${methodDetail}\n\n_Sent from Gaayathri Sarees website_`;
+      closeRefundModal();
+      window.open('https://wa.me/919666041369?text=' + encodeURIComponent(msg), '_blank');
+    }
+
+    /* ══════════════════════════════════════
+       WHATSAPP ENQUIRY (contact form)
+    ══════════════════════════════════════ */
     function sendWhatsApp() {
       const name  = document.getElementById('fname').value.trim() || 'Customer';
       const phone = document.getElementById('fphone').value.trim();
