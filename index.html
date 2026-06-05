@@ -1743,7 +1743,7 @@
           </div>
 
           <div class="upi-paid-confirm">
-            <p>📸 Payment screenshot upload చేయండి — UTR automatically detect అవుతుంది:</p>
+            <p>📸 Upload your payment screenshot — UTR will be detected automatically:</p>
 
             <!-- Screenshot upload area -->
             <div id="utrScreenshotArea" onclick="document.getElementById('utrScreenshotFile').click()" style="border:2px dashed rgba(212,175,55,.45);border-radius:4px;padding:22px 16px;text-align:center;cursor:pointer;background:rgba(212,175,55,.05);margin-bottom:10px;transition:background .2s;" onmouseover="this.style.background='rgba(212,175,55,.10)'" onmouseout="this.style.background='rgba(212,175,55,.05)'">
@@ -1752,8 +1752,8 @@
               </div>
               <div id="utrUploadPrompt">
                 <div style="font-size:2rem;margin-bottom:6px;">📱</div>
-                <p style="font-family:var(--font);font-size:.72rem;color:rgba(212,175,55,.85);letter-spacing:.1em;margin-bottom:4px;">GPay / PhonePe screenshot upload చేయండి</p>
-                <p style="font-family:var(--font);font-size:.6rem;color:rgba(253,246,227,.4);letter-spacing:.06em;">AI UTR number automatically read చేస్తుంది</p>
+                <p style="font-family:var(--font);font-size:.72rem;color:rgba(212,175,55,.85);letter-spacing:.1em;margin-bottom:4px;">Tap to upload GPay / PhonePe screenshot</p>
+                <p style="font-family:var(--font);font-size:.6rem;color:rgba(253,246,227,.4);letter-spacing:.06em;">AI will automatically read your UTR number</p>
               </div>
               <input id="utrScreenshotFile" type="file" accept="image/*" style="display:none;" onchange="handleUtrScreenshot(this)"/>
             </div>
@@ -1761,12 +1761,12 @@
             <!-- AI scanning status -->
             <div id="utrScanStatus" style="display:none;font-family:var(--font);font-size:.68rem;letter-spacing:.08em;color:var(--gold);text-align:center;padding:8px;margin-bottom:8px;">
               <span id="utrScanSpinner" style="display:inline-block;animation:spin 1s linear infinite;">⟳</span>
-              <span id="utrScanMsg"> Screenshot చదువుతున్నాం...</span>
+              <span id="utrScanMsg"> Reading screenshot...</span>
             </div>
 
             <!-- Manual fallback (collapsed by default) -->
             <div id="utrManualToggle" style="text-align:center;margin-bottom:8px;">
-              <span onclick="toggleManualUtr()" style="font-family:var(--font);font-size:.62rem;color:rgba(212,175,55,.5);letter-spacing:.1em;cursor:pointer;text-decoration:underline;text-underline-offset:3px;">✏️ Manually enter చేయాలంటే ఇక్కడ నొక్కండి</span>
+              <span onclick="toggleManualUtr()" style="font-family:var(--font);font-size:.62rem;color:rgba(212,175,55,.5);letter-spacing:.1em;cursor:pointer;text-decoration:underline;text-underline-offset:3px;">✏️ Enter UTR manually instead</span>
             </div>
             <div id="utrManualSection" style="display:none;">
               <div style="display:flex;gap:8px;align-items:stretch;margin-bottom:6px;">
@@ -1787,9 +1787,9 @@
           <div id="payPendingBanner">
             <div class="pend-icon">⏳</div>
             <p><strong>Payment Verification Pending</strong><br/>
-            మీ UTR number మాకు WhatsApp లో వెళ్ళింది.<br/>
-            మేము GPay లో verify చేసి <strong>2–4 గంటల్లో</strong> confirm చేస్తాము.<br/>
-            Confirm అయిన తర్వాతే order dispatch అవుతుంది.</p>
+            Your UTR has been sent to us via WhatsApp.<br/>
+            We will verify on GPay and confirm within <strong>2–4 hours</strong>.<br/>
+            Your order will be dispatched only after confirmation.</p>
           </div>
         </div>
       </div>
@@ -2456,7 +2456,7 @@
         // Show scanning status
         const status = document.getElementById('utrScanStatus');
         status.style.display = 'block';
-        document.getElementById('utrScanMsg').textContent = ' Screenshot చదువుతున్నాం...';
+        document.getElementById('utrScanMsg').textContent = ' Reading your screenshot...';
 
         try {
           const resp = await fetch('https://api.anthropic.com/v1/messages', {
@@ -2485,7 +2485,7 @@
           const raw = (data.content?.[0]?.text || '').trim();
 
           if (raw === 'NOT_FOUND' || !raw) {
-            document.getElementById('utrScanMsg').textContent = ' UTR కనిపించలేదు — manually enter చేయండి';
+            document.getElementById('utrScanMsg').textContent = ' UTR not found — please enter manually';
             document.getElementById('utrScanSpinner').style.display = 'none';
             toggleManualUtr();
           } else {
@@ -2496,11 +2496,11 @@
             // Show success in hint
             const hint = document.getElementById('utrHint');
             hint.className = 'utr-hint valid';
-            hint.textContent = `✓ Screenshot లో UTR కనిపించింది: ${utr} — confirm చేయండి`;
+            hint.textContent = `✓ UTR detected from screenshot: ${utr} — click Confirm to proceed`;
           }
 
         } catch (err) {
-          document.getElementById('utrScanMsg').textContent = ' Error — manually enter చేయండి';
+          document.getElementById('utrScanMsg').textContent = ' Error reading screenshot — please enter manually';
           document.getElementById('utrScanSpinner').style.display = 'none';
           toggleManualUtr();
         }
@@ -2545,10 +2545,10 @@
         } else if (text.trim()) {
           setUtrValue(text.trim().slice(0, 30));
         } else {
-          alert('Clipboard empty — bank app లో UTR copy చేసి మళ్ళీ try చేయండి.');
+          alert('Clipboard is empty — copy your UTR from your bank app and try again.');
         }
       } catch (e) {
-        const pasted = prompt('Bank app message ఇక్కడ paste చేయండి — UTR automatically detect అవుతుంది:');
+        const pasted = prompt('Paste your payment message here — UTR will be detected automatically:');
         if (pasted) {
           const utr = extractUtrFromText(pasted) || pasted.trim();
           setUtrValue(utr);
@@ -2564,7 +2564,7 @@
         const inp = document.getElementById('upiTxnInput');
         if (utr && !inp.value) {
           _clipboardUtrCandidate = utr;
-          hint.textContent = `📋 Clipboard లో UTR కనిపించింది: ${utr} — tap చేసి fill చేయండి ✓`;
+          hint.textContent = `📋 UTR found in clipboard: ${utr} — tap to fill ✓`;
           hint.style.display = 'block';
         }
       } catch (e) { /* permission denied — silently ignore */ }
@@ -2590,21 +2590,21 @@
       const BLOCKED = ['123456789012','000000000000','111111111111','999999999999','123456789','12345678','TEST','FAKE','DEMO'];
       if (BLOCKED.some(b => v === b || v.startsWith(b))) {
         hint.className = 'utr-hint invalid';
-        hint.textContent = '🚫 Invalid UTR — bank app లో real UTR copy cheyyandi';
+        hint.textContent = '🚫 Invalid UTR — please copy your real UTR from your bank app';
         return { valid: false, reason: 'blocked' };
       }
 
       // 2. All same repeated digits
       if (/^(.)\1{11,}$/.test(v)) {
         hint.className = 'utr-hint invalid';
-        hint.textContent = '🚫 UTR valid కాదు — bank payment history లో UTR copy cheyyandi';
+        hint.textContent = '🚫 Invalid UTR — copy the UTR from your bank payment history';
         return { valid: false, reason: 'repeated' };
       }
 
       // 3. Sequential digits
       if (/^0?123456789/.test(v)) {
         hint.className = 'utr-hint invalid';
-        hint.textContent = '🚫 Fake UTR detected — bank app లో actual UTR copy cheyyandi';
+        hint.textContent = '🚫 Fake UTR detected — please copy the actual UTR from your bank app';
         return { valid: false, reason: 'sequential' };
       }
 
@@ -2613,26 +2613,26 @@
       const isAlphanumeric = /^[A-Z0-9]{15,22}$/.test(v);
       if (!is12digit && !isAlphanumeric) {
         hint.className = 'utr-hint invalid';
-        hint.textContent = '✗ UTR: 12 digits (GPay/PhonePe) లేదా 15-22 chars (NEFT/IMPS) ఉండాలి';
+        hint.textContent = '✗ UTR must be 12 digits (GPay/PhonePe) or 15-22 characters (NEFT/IMPS)';
         return { valid: false, reason: 'format' };
       }
 
       // 5. Duplicate in session
       if (_submittedUtrs.has(v)) {
         hint.className = 'utr-hint invalid';
-        hint.textContent = '⚠️ ఈ UTR ఇప్పటికే submit అయింది — different order కి different UTR ఉంటుంది';
+        hint.textContent = '⚠️ This UTR has already been submitted — each transaction has a unique UTR';
         return { valid: false, reason: 'duplicate' };
       }
 
       hint.className = 'utr-hint valid';
-      hint.textContent = '✓ Valid UTR — confirm చేయండి';
+      hint.textContent = '✓ Valid UTR — click Confirm below';
       return { valid: true, reason: 'ok' };
     }
 
     function confirmUpiPayment() {
       const txn = document.getElementById('upiTxnInput').value.trim();
       if (!txn) {
-        alert('UTR / Transaction ID enter cheyyandi.\nBank app లో payment history లో UTR copy చేయండి.');
+        alert('Please enter your UTR / Transaction ID.\nFind it in your bank app payment history.');
         return;
       }
 
@@ -2640,13 +2640,13 @@
 
       if (!result.valid) {
         if (result.reason === 'duplicate') {
-          alert('⚠️ ఈ UTR number ఇప్పటికే use అయింది!\nDifferent transaction కి different UTR number ఉంటుంది.');
+          alert('⚠️ This UTR has already been used!\nEach transaction has a unique UTR number.');
           return;
         } else if (result.reason === 'blocked' || result.reason === 'sequential' || result.reason === 'repeated') {
-          alert('🚫 ఇది valid UTR కాదు.\n\nReal UTR ఎలా చూడాలి:\n• GPay: Payment → View details → UTR Number\n• PhonePe: History → Transaction → Reference ID\n• Paytm: Passbook → Transaction details → UTR\n• BHIM: Transaction History → Reference Number');
+          alert('🚫 This is not a valid UTR.\n\nHow to find your real UTR:\n• GPay: Payment → View details → UTR Number\n• PhonePe: History → Transaction → Reference ID\n• Paytm: Passbook → Transaction details → UTR\n• BHIM: Transaction History → Reference Number');
           return;
         } else {
-          const go = confirm('UTR format సరిగ్గా లేదు.\n\nReal UTR: 12 digits (GPay/PhonePe) లేదా 15-22 alphanumeric (NEFT).\n\nBank app లో check చేసి try చేయండి.\nContinue చేయాలంటే OK నొక్కండి.');
+          const go = confirm('UTR format is incorrect.\n\nReal UTR: 12 digits (GPay/PhonePe) or 15-22 alphanumeric (NEFT).\n\nPlease check your bank app and try again.\nClick OK to continue anyway.');
           if (!go) return;
         }
       }
@@ -2777,13 +2777,13 @@
 
       if (payMethod === 'UPI' && !upiConfirmed) {
         const proceed = confirm(
-          'Payment Confirm కాలేదు!\n\n' +
-          'మీరు ఇంకా UTR / Transaction ID submit చేయలేదు.\n\n' +
-          'UPI payment చేసి UTR number enter చేయకుండా order place చేస్తే:\n' +
-          '  - Rs.50 UPI discount వర్తించదు\n' +
-          '  - Payment verify కాకుండా order dispatch కాదు\n\n' +
-          'Payment చేసి UTR submit చేయడానికి Cancel నొక్కండి.\n' +
-          'Anyway proceed చేయాలంటే OK నొక్కండి.'
+          'Payment Not Confirmed!\n\n' +
+          'You have not submitted your UTR / Transaction ID yet.\n\n' +
+          'If you place the order without submitting UTR:\n' +
+          '  - Rs.50 UPI discount will not apply\n' +
+          '  - Order will not be dispatched until payment is verified\n\n' +
+          'Click Cancel to go back and submit your UTR.\n' +
+          'Click OK to proceed anyway.'
         );
         if (!proceed) return;
       }
@@ -3073,7 +3073,7 @@
       const payInfo = payMethod === 'COD'
         ? `💵 *Payment:* CASH ON DELIVERY\nAmount to collect: ₹${total.toLocaleString('en-IN')}`
         : upiConfirmed
-          ? `⏳ *Payment:* UPI — VERIFICATION PENDING\n🔢 *UTR Number:* ${txnRef}\n💰 Amount: ₹${total.toLocaleString('en-IN')}\n👉 GPay లో verify చేసి confirm cheyyandi`
+          ? `⏳ *Payment:* UPI — VERIFICATION PENDING\n🔢 *UTR Number:* ${txnRef}\n💰 Amount: ₹${total.toLocaleString('en-IN')}\n👉 Please verify on GPay and confirm`
           : `📲 *Payment:* UPI — UTR not submitted yet\nAmount: ₹${total.toLocaleString('en-IN')}`;
 
       const waText =
@@ -3245,15 +3245,15 @@
         const payMsg = payMethod === 'COD'
           ? '💵 Payment: Cash on Delivery — pay at doorstep'
           : (upiConfirmed
-            ? `⏳ UPI UTR submitted (${txnRef}) — మేము GPay లో verify చేసి 2-4 గంటల్లో confirm చేస్తాము. Confirm తర్వాతే dispatch!`
-            : '📲 UPI Payment — UTR submit చేయలేదు, payment verify కాదు');
+            ? `⏳ UPI UTR submitted (${txnRef}) — we will verify on GPay and confirm within 2-4 hours. Order dispatches after confirmation!`
+            : '📲 UPI Payment — UTR not submitted, payment not verified');
         const emailNote = custEmail ? `📧 Invoice email sent to ${custEmail}` : `📧 Email sent to Gaayathri Sarees`;
         const invoiceNote = (payMethod === 'COD')
           ? '📄 GST Invoice PDF downloaded ✅'
           : (upiConfirmed
             ? '📄 GST Invoice PDF downloaded ✅ (Payment Verified)'
-            : '⏳ GST Invoice: Payment confirm అయిన తర్వాత generate అవుతుంది');
-        const waNote = payMethod === 'UPI' ? '📱 WhatsApp కి UTR పంపించాం' : '📱 WhatsApp కి order details పంపించాం';
+            : '⏳ GST Invoice: Will be generated after payment confirmation');
+        const waNote = payMethod === 'UPI' ? '📱 UTR sent to WhatsApp' : '📱 Order details sent to WhatsApp';
         alert(`✅ Order Placed! — ${orderNo}\n\n${invoiceNote}\n${waNote}\n${emailNote}\n\n📅 Estimated Delivery: ${deliveryDateStr}\n\n${payMsg}\n\nThank you for shopping with Gaayathri Sarees! 🌸`);
       }, 500);
     }
