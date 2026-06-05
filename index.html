@@ -1025,13 +1025,8 @@
       font-weight:700; letter-spacing:.12em; padding:6px 14px;
       display:inline-block; margin-bottom:14px; border-radius:2px;
     }
-    .qr-box {
-      text-align:center; margin:16px 0;
-      border:1px solid rgba(212,175,55,.3);
-      background:rgba(255,255,255,.04); padding:16px;
-    }
-    .qr-box img { max-width:220px; width:100%; border-radius:4px; }
-    .qr-box p { font-family:var(--font); font-size:.7rem; color:rgba(253,246,227,.6); margin-top:8px; letter-spacing:.1em; }
+
+
     .upi-paid-confirm {
       background:rgba(39,174,96,.12); border:1px solid rgba(39,174,96,.4);
       padding:14px 16px; margin-top:12px; border-radius:2px;
@@ -1688,7 +1683,7 @@
         <p style="font-family:var(--font);font-size:.65rem;letter-spacing:.25em;color:var(--gold);text-transform:uppercase;margin-bottom:14px;">Payment Method</p>
         <div class="pay-method-row">
           <button class="pay-method-btn selected" id="btnCOD" onclick="selectPayMethod('COD')">💵 Cash on Delivery</button>
-          <button class="pay-method-btn" id="btnUPI" onclick="selectPayMethod('UPI')">📲 UPI / QR Pay</button>
+          <button class="pay-method-btn" id="btnUPI" onclick="selectPayMethod('UPI')">📲 Pay via UPI</button>
         </div>
 
         <!-- COD Info -->
@@ -1735,12 +1730,7 @@
             ⚡ Pay Now — Open App
           </button>
 
-          <!-- OR scan QR -->
-          <div class="qr-box" style="margin-top:14px;">
-            <p style="font-family:var(--font);font-size:.65rem;color:rgba(212,175,55,.6);letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px;">— or Scan QR Code —</p>
-            <img src="https://raw.githubusercontent.com/gaayathrisarees/gaayathrisarees/main/images/Qr.jpeg" alt="UPI QR Code"/>
-            <p>UPI ID: gpay-12203208782@okbizaxis</p>
-          </div>
+
 
           <div class="upi-paid-confirm">
             <p>📸 Upload your payment screenshot — UTR will be detected automatically:</p>
