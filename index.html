@@ -1883,7 +1883,10 @@
             <span>Item Price</span><span id="sumItemPrice">₹0</span>
           </div>
           <div style="display:flex;justify-content:space-between;font-size:.8rem;color:rgba(253,246,227,.7);">
-            <span>GST (5%)</span><span id="sumGST">₹0</span>
+            <span id="sumCGSTLabel">CGST (2.5%)</span><span id="sumCGST">₹0</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:.8rem;color:rgba(253,246,227,.7);">
+            <span id="sumSGSTLabel">SGST (2.5%)</span><span id="sumSGST">₹0</span>
           </div>
           <div style="display:flex;justify-content:space-between;font-size:.8rem;color:rgba(253,246,227,.7);">
             <span id="deliveryLabel">Delivery Charges</span><span id="sumDelivery">₹0</span>
@@ -2606,12 +2609,19 @@
       const unitPrice = currentItem.price || 0;
       const qty   = currentItem.qty  || 1;
       const sub   = unitPrice * qty;
-      const gst   = Math.round(sub * (getAdminSetting('gsGstRate', 5) / 100));
+      const gstRate = getAdminSetting('gsGstRate', 5);
+      const gst   = Math.round(sub * (gstRate / 100));
+      const cgst  = Math.round(gst / 2);
+      const sgst  = gst - cgst;
+      const halfRate = gstRate / 2;
       const total = sub + gst + (delivery || 0);
       const orderNo = getOrderCount();
 
       document.getElementById('sumItemPrice').textContent = '₹' + sub.toLocaleString('en-IN') + (qty > 1 ? ' (×' + qty + ')' : '');
-      document.getElementById('sumGST').textContent       = '₹' + gst.toLocaleString('en-IN');
+      document.getElementById('sumCGSTLabel').textContent = `CGST (${halfRate}%)`;
+      document.getElementById('sumSGSTLabel').textContent = `SGST (${halfRate}%)`;
+      document.getElementById('sumCGST').textContent      = '₹' + cgst.toLocaleString('en-IN');
+      document.getElementById('sumSGST').textContent      = '₹' + sgst.toLocaleString('en-IN');
 
       if (delivery === null) {
         document.getElementById('sumDelivery').textContent = 'Enter pincode';
@@ -3288,10 +3298,13 @@
       doc.setFontSize(8.5);
       doc.text('Category: ' + (currentItem.desc || 'Saree'), px, y + 16);
 
-      /* Price table */
+      /* Price table — CGST + SGST split for CA / GSTR-1 */
+      const cgst = Math.round(gst / 2);
+      const sgst = gst - cgst;
       const rows = [
         ['Item Price', qty > 1 ? `₹${unitPrice.toLocaleString('en-IN')} × ${qty}` : '', `₹${sub.toLocaleString('en-IN')}`],
-        [`GST (${gstRatePct}%)`, '', `₹${gst.toLocaleString('en-IN')}`],
+        [`CGST (${gstRatePct/2}%)`, 'Central GST', `₹${cgst.toLocaleString('en-IN')}`],
+        [`SGST (${gstRatePct/2}%)`, 'State GST', `₹${sgst.toLocaleString('en-IN')}`],
         ['Delivery', km && km <= freeKm ? 'Within free zone' : (delivery === 0 ? 'Free (New Customer)' : `${km} km`), delivery === 0 ? 'FREE' : `₹${delivery.toLocaleString('en-IN')}`],
       ];
       if (upiDiscount > 0) rows.push(['UPI Discount', 'Online Payment', `-₹${upiDiscount.toLocaleString('en-IN')}`]);
@@ -3425,7 +3438,8 @@
         `*Item:* ${currentItem.name}\n` +
         `*Qty:* ${qty}\n` +
         `*Item Price:* ₹${sub.toLocaleString('en-IN')}\n` +
-        `*GST (${gstRatePct}%):* ₹${gst.toLocaleString('en-IN')}\n` +
+        `*CGST (${gstRatePct/2}%):* ₹${Math.round(gst/2).toLocaleString('en-IN')}\n` +
+        `*SGST (${gstRatePct/2}%):* ₹${(gst - Math.round(gst/2)).toLocaleString('en-IN')}\n` +
         `*Delivery:* ${delivery === 0 ? 'FREE' : '₹' + delivery.toLocaleString('en-IN')}\n` +
         (upiDiscount > 0 ? `*UPI Discount:* -₹${upiDiscount}\n` : '') +
         `*Total:* ₹${total.toLocaleString('en-IN')}\n` +
@@ -3506,7 +3520,8 @@
               `<tr><td style="color:#c0b0d0;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.07);font-size:13px;">Item</td><td style="color:#FDF6E3;text-align:right;border-bottom:1px solid rgba(255,255,255,0.07);font-weight:bold;">${currentItem.name}</td></tr>` +
               `<tr><td style="color:#c0b0d0;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.07);font-size:13px;">Quantity</td><td style="color:#FDF6E3;text-align:right;border-bottom:1px solid rgba(255,255,255,0.07);">${qty}</td></tr>` +
               `<tr><td style="color:#c0b0d0;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.07);font-size:13px;">Item Price</td><td style="color:#FDF6E3;text-align:right;border-bottom:1px solid rgba(255,255,255,0.07);">₹${sub.toLocaleString('en-IN')}</td></tr>` +
-              `<tr><td style="color:#c0b0d0;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.07);font-size:13px;">GST (${gstRatePct}%)</td><td style="color:#FDF6E3;text-align:right;border-bottom:1px solid rgba(255,255,255,0.07);">₹${gst.toLocaleString('en-IN')}</td></tr>` +
+              `<tr><td style="color:#c0b0d0;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.07);font-size:13px;">CGST (${gstRatePct/2}%)</td><td style="color:#FDF6E3;text-align:right;border-bottom:1px solid rgba(255,255,255,0.07);">₹${Math.round(gst/2).toLocaleString('en-IN')}</td></tr>` +
+              `<tr><td style="color:#c0b0d0;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.07);font-size:13px;">SGST (${gstRatePct/2}%)</td><td style="color:#FDF6E3;text-align:right;border-bottom:1px solid rgba(255,255,255,0.07);">₹${(gst - Math.round(gst/2)).toLocaleString('en-IN')}</td></tr>` +
               `<tr><td style="color:#c0b0d0;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.07);font-size:13px;">Delivery</td><td style="color:#FDF6E3;text-align:right;border-bottom:1px solid rgba(255,255,255,0.07);">${delivery === 0 ? '<span style="color:#6ddc82;">FREE 🎉</span>' : '₹' + delivery.toLocaleString('en-IN')}</td></tr>` +
               (upiDiscount > 0 ? `<tr><td style="color:#c0b0d0;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.07);font-size:13px;">UPI Discount</td><td style="color:#6ddc82;text-align:right;border-bottom:1px solid rgba(255,255,255,0.07);">-₹${upiDiscount}</td></tr>` : '') +
               `<tr style="background:rgba(212,175,55,0.15);"><td style="color:#D4AF37;font-weight:bold;padding:10px 0 10px 6px;font-size:15px;">TOTAL</td><td style="color:#D4AF37;font-weight:bold;text-align:right;font-size:16px;padding-right:4px;">₹${total.toLocaleString('en-IN')}</td></tr>` +
